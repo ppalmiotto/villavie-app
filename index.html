@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2d5a3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Villa Vie">
+<meta name="description" content="Villa Vie Residences — Official Resident App">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Villa Vie Residences</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">VV</div>
+  <div>
+    <div class="splash-title">Villa Vie<br>Residences</div>
+    <div class="splash-sub">Resident App</div>
+  </div>
+  <div class="splash-loader"><div class="splash-bar"></div></div>
+</div>
+
+<!-- RESIDENT LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-bg">
+    <div class="login-card">
+      <div class="login-logo">VV</div>
+      <div class="login-title">Villa Vie<br>Residences</div>
+      <div class="login-sub">Resident Portal</div>
+      <div class="form-group" style="margin-top:28px">
+        <label class="form-label" for="loginEmail">Email Address</label>
+        <input id="loginEmail" class="form-input" type="email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Password</label>
+        <input id="loginPassword" class="form-input" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="loginError" class="modal-error" role="alert" style="display:none"></div>
+      <button id="loginBtn" class="btn-login" onclick="residentLogin()">Sign In</button>
+      <button class="btn-forgot" onclick="requestPasswordReset()">Forgot password?</button>
+      <div class="login-footer">Access is by invitation only.<br>Contact your voyage team to request access.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD RESET SCREEN -->
+<div id="passwordResetScreen" style="display:none">
+  <div class="login-bg">
+    <div class="login-card">
+      <div class="login-logo">VV</div>
+      <div class="login-title">Set New<br>Password</div>
+      <div class="login-sub">Enter your new password below</div>
+      <div class="form-group" style="margin-top:28px">
+        <label class="form-label" for="newPassword">New Password</label>
+        <input id="newPassword" class="form-input" type="password" placeholder="At least 6 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="newPassword2">Confirm Password</label>
+        <input id="newPassword2" class="form-input" type="password" placeholder="Repeat password">
+      </div>
+      <div id="resetError" class="modal-error" role="alert" style="display:none"></div>
+      <button class="btn-login" onclick="submitNewPassword()">Update Password</button>
+      <button class="btn-forgot" onclick="hidePasswordResetForm()">Back to sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMERGENCY ALERT BANNER — fixed top, visible on every page -->
+<div id="emergencyBanner" role="alert" aria-live="assertive">
+  <div class="emg-banner-inner">
+    <div class="emg-banner-icon">🚨</div>
+    <div class="emg-banner-content">
+      <div class="emg-banner-title" id="emgBannerTitle">Emergency Alert</div>
+      <div class="emg-banner-body" id="emgBannerBody"></div>
+      <div class="emg-banner-time" id="emgBannerTime"></div>
+    </div>
+    <button class="emg-banner-close" onclick="dismissEmergencyBanner()" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="adminModal" role="dialog" aria-modal="true" aria-label="Admin sign in">
+  <div class="modal-box">
+    <div class="modal-title">Admin Sign In</div>
+    <div class="modal-sub">Enter your crew credentials to manage content.</div>
+    <div class="form-group">
+      <label class="form-label" for="adminEmail">Email</label>
+      <input id="adminEmail" class="form-input" type="email" placeholder="crew@villavie.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="adminPass">Password</label>
+      <input id="adminPass" class="form-input" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div id="loginError" class="modal-error" role="alert">Incorrect credentials. Please try again.</div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <button class="btn-outline" onclick="closeAdminModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXCURSION MODAL -->
+<div id="excursionModal" role="dialog" aria-modal="true">
+  <div class="modal-box modal-wide">
+    <div class="modal-close" onclick="closeExcursionModal()">✕</div>
+    <div id="excursionContent"></div>
+  </div>
+</div>
+
+<!-- NOTIFICATION BANNER -->
+<div id="notifBanner" role="alert">
+  <div id="notifText"></div>
+  <button id="notifClose" onclick="dismissNotif()">✕</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-logo">
+      <div class="header-emblem">VV</div>
+      <div class="header-name">Villa Vie</div>
+    </div>
+    <div class="header-actions">
+      <span id="residentEmail" class="resident-email"></span>
+      <span id="adminBadge" class="admin-badge">Crew</span>
+      <button class="btn-icon" id="adminBtn" onclick="toggleAdminLogin()" aria-label="Admin login" title="Admin login">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </button>
+      <button class="btn-icon" onclick="residentLogout()" aria-label="Sign out" title="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- TOP NAV (desktop) -->
+  <nav id="mainNav" role="tablist">
+    <button class="nav-tab active" role="tab" aria-selected="true" onclick="switchTab('itinerary',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Itinerary
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('schedule',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Schedule
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('updates',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M15 17H20L18.6 15.6A9 9 0 0019 13 7 7 0 105 13a9 9 0 00.4 2.6L4 17h5M12 21v-4"/></svg>
+      Updates &amp; Chat
+      <span id="updatesBadge" class="notif-dot"></span>
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('safety',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Safety
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('spa',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      Spa
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('venues',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Venues
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('rent',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Rent Villa Vie
+    </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('chat',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chat
+      <span id="chatBadge" class="notif-dot"></span>
+    </button>
+  </nav>
+
+  <main id="mainContent">
+
+        <!-- __ ITINERARY LIST __ -->
+    <div class="view active" id="view-itinerary" role="tabpanel">
+      <div class="voyage-banner">
+        <div class="voyage-route">2026-2030 Odyssey</div>
+        <div class="voyage-title" id="voyageTitle">Loading...</div>
+        <div class="voyage-meta">
+          <div class="voyage-stat"><span class="voyage-stat-label">Ship</span><span class="voyage-stat-value">Odyssey</span></div>
+          <div class="voyage-stat"><span class="voyage-stat-label">Ports this month</span><span class="voyage-stat-value" id="voyagePortCount">-</span></div>
+        </div>
+      </div>
+      <div class="itin-month-nav">
+        <button class="cal-nav-btn" onclick="itinPrev()">&#8249;</button>
+        <div class="cal-title" id="itinMonthTitle">Loading...</div>
+        <button class="cal-nav-btn" onclick="itinNext()">&#8250;</button>
+      </div>
+      <div class="day-nav" id="segmentFilter" style="padding:0 12px 8px;overflow-x:auto;"></div>
+      <div id="portList" class="itin-list"></div>
+      <div id="portDetailPanel" class="port-detail-panel" style="display:none">
+        <div class="port-detail-inner">
+          <button class="port-detail-close" onclick="closePortDetail()">X</button>
+          <div id="portDetailContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCHEDULE ── -->
+    <div class="view" id="view-schedule" role="tabpanel">
+      <div class="view-inner">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Daily Schedule</div>
+            <div class="section-sub" id="scheduleDate"></div>
+          </div>
+          <div id="addEventBtn" class="admin-only">
+            <button class="btn-gold btn-sm" onclick="toggleForm('addEventForm')">+ Event</button>
+          </div>
+        </div>
+
+        <div id="addEventForm" class="admin-panel" style="display:none">
+          <div class="admin-panel-title">Add Event</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Time</label><input id="evTime" class="form-input" placeholder="09:00 AM"></div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="evCat" class="form-select">
+                <option value="activity">Activity</option>
+                <option value="dining">Dining</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="wellness">Wellness</option>
+                <option value="port">Port</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">Title</label><input id="evTitle" class="form-input" placeholder="e.g. Morning yoga on deck"></div>
+          <div class="form-group"><label class="form-label">Location / Details</label><input id="evLocation" class="form-input" placeholder="e.g. Sun Deck, Level 10"></div>
+          <div class="form-actions">
+            <button class="btn-gold" onclick="addEvent()">Add Event</button>
+            <button class="btn-outline" onclick="hideForm('addEventForm')">Cancel</button>
+          </div>
+        </div>
+
+        <div class="day-nav" id="dayNav">
+          <button class="day-btn active" onclick="selectDay(0,this)">Today</button>
+          <button class="day-btn" onclick="selectDay(1,this)">Thu 22</button>
+          <button class="day-btn" onclick="selectDay(2,this)">Fri 23</button>
+          <button class="day-btn" onclick="selectDay(3,this)">Sat 24</button>
+          <button class="day-btn" onclick="selectDay(4,this)">Sun 25</button>
+        </div>
+
+        <div id="eventList"></div>
+      </div>
+    </div>
+
+    <!-- ── UPDATES ── -->
+    <div class="view" id="view-updates" role="tabpanel">
+      <div class="combined-tab-nav">
+        <button class="combined-tab-btn active" id="subTabUpdates" onclick="switchSubTab('updates-content','subTabUpdates')">Updates</button>
+        <button class="combined-tab-btn" id="subTabChat" onclick="switchSubTab('chat-content','subTabChat');onChatTabOpen()">Chat<span id="chatBadge" class="notif-dot"></span></button>
+      </div>
+      <div id="updates-content" class="sub-tab-content active">
+      <div class="view-inner">
+
+        <!-- EMERGENCY MESSAGE — Admin only -->
+        <div id="emergencyAdminBtn" class="admin-only" style="margin-bottom:16px">
+          <button class="btn-emergency" onclick="toggleForm('emergencyComposeForm')">
+            🚨 Send Emergency Alert
+          </button>
+        </div>
+
+        <div id="emergencyComposeForm" class="emergency-compose" style="display:none">
+          <div class="emergency-compose-title">⚠️ Compose Emergency Alert</div>
+          <div class="emergency-compose-sub">This message will appear as a red alert banner at the top of every page for all residents.</div>
+          <div class="form-group">
+            <label class="form-label">Alert Title</label>
+            <input id="emgTitle" class="form-input emg-input" placeholder="e.g. Immediate Muster Required">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea id="emgBody" class="form-textarea emg-input" placeholder="e.g. All residents must proceed immediately to their muster station. Bring your life jacket."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-emergency" onclick="sendEmergencyAlert()">🚨 Send Alert Now</button>
+            <button class="btn-outline" onclick="clearEmergencyAlert()">✓ Clear Active Alert</button>
+            <button class="btn-outline" onclick="hideForm('emergencyComposeForm')">Cancel</button>
+          </div>
+        </div>
+
+        <!-- ACTIVE EMERGENCY MESSAGES -->
+        <div id="emergencyMessageList"></div>
+
+        <!-- DIVIDER between emergency and regular updates -->
+        <div id="updatesDivider" style="display:none" class="updates-divider">
+          <span>Announcements</span>
+        </div>
+
+        <!-- POST UPDATE — Admin only -->
+        <div id="addUpdateForm" class="admin-panel" style="display:none">
+          <div class="admin-panel-title">Post an Update</div>
+          <div class="form-group"><label class="form-label">Title</label><input id="newUpdateTitle" class="form-input" placeholder="e.g. Dinner reservation reminder"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="newUpdateCat" class="form-select">
+                <option value="announcement">Announcement</option>
+                <option value="dining">Dining</option>
+                <option value="activities">Activities</option>
+                <option value="general">General</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send notification?</label>
+              <select id="newUpdateNotif" class="form-select">
+                <option value="yes">Yes — notify residents</option>
+                <option value="no">No — post quietly</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">Message</label><textarea id="newUpdateBody" class="form-textarea" placeholder="Write your update here..."></textarea></div>
+          <div class="form-actions">
+            <button class="btn-gold" onclick="postUpdate()">Post Update</button>
+            <button class="btn-outline" onclick="hideForm('addUpdateForm')">Cancel</button>
+          </div>
+        </div>
+
+        <!-- POLLS SECTION -->
+        <div id="addPollBtn" class="admin-only" style="margin-bottom:16px">
+          <button class="btn-gold btn-sm" onclick="toggleForm('addPollForm')">📊 Create Poll</button>
+        </div>
+
+        <div id="addPollForm" class="admin-panel" style="display:none">
+          <div class="admin-panel-title">Create a Poll</div>
+          <div class="form-group">
+            <label class="form-label">Question</label>
+            <input id="pollQuestion" class="form-input" placeholder="e.g. What excursion are you most excited about?">
+          </div>
+          <div id="pollOptions">
+            <div class="form-group"><label class="form-label">Options</label>
+              <input id="pollOpt0" class="form-input" placeholder="Option 1" style="margin-bottom:8px">
+              <input id="pollOpt1" class="form-input" placeholder="Option 2" style="margin-bottom:8px">
+              <input id="pollOpt2" class="form-input" placeholder="Option 3 (optional)" style="margin-bottom:8px">
+              <input id="pollOpt3" class="form-input" placeholder="Option 4 (optional)">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-gold" onclick="createPoll()">Post Poll</button>
+            <button class="btn-outline" onclick="hideForm('addPollForm')">Cancel</button>
+          </div>
+        </div>
+
+        <div id="pollList"></div>
+
+        <div class="updates-divider" id="updatesDivider2" style="margin-top:8px"><span>Announcements</span></div>
+
+        <div class="section-header">
+          <div>
+            <div class="section-title">Shipboard Updates</div>
+            <div class="section-sub">Latest announcements &amp; news</div>
+          </div>
+          <div id="addUpdateBtn" class="admin-only">
+            <button class="btn-gold btn-sm" onclick="toggleForm('addUpdateForm')">+ Post</button>
+          </div>
+        </div>
+
+        <div id="updateList"></div>
+      </div>
+      </div>
+      <div id="chat-content" class="sub-tab-content chat-sub-tab">
+        <div class="chat-header-bar"><div class="chat-channels"><button class="chat-channel-btn active" id="channelBtnGeneral" onclick="switchChannel('general')">Resident Chat</button><button class="chat-channel-btn" id="channelBtnSupport" onclick="switchChannel('support')">Crew Support</button></div><div class="chat-channel-desc" id="chatChannelDesc">Open community chat</div></div>
+        <div class="chat-messages" id="chatMessages"><div class="chat-loading">Loading...</div></div>
+        <div class="chat-composer" id="chatComposer"><div id="chatImagePreview" style="display:none"></div><div class="chat-composer-inner"><label class="chat-img-btn"><input type="file" accept="image/*" style="display:none" onchange="handleChatImageSelect(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></label><input id="chatInput" class="chat-input" type="text" placeholder="Type a message..." maxlength="500" autocomplete="off"><button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg></button></div></div>
+      </div>
+    </div>
+
+    <!-- ── SAFETY ── -->
+    <div class="view" id="view-safety" role="tabpanel">
+      <div class="view-inner">
+        <div class="safety-hero">
+          <div class="safety-icon">🛟</div>
+          <div class="safety-title">Safety &amp; Emergency</div>
+          <div class="safety-sub">Villa Vie Odyssey · IMO 9876543</div>
+        </div>
+
+        <div class="emergency-strip">
+          <a href="tel:+0000" class="emergency-btn-link">
+            <span>📞</span> Emergency Line
+          </a>
+          <a href="tel:+0001" class="emergency-btn-link emergency-btn-link-alt">
+            <span>🏥</span> Medical Center
+          </a>
+        </div>
+
+        <div id="addSafetyBtn" class="admin-only" style="margin-bottom:16px">
+          <button class="btn-gold btn-sm" onclick="toggleForm('addSafetyForm')">+ Add Info</button>
+        </div>
+
+        <div id="addSafetyForm" class="admin-panel" style="display:none">
+          <div class="admin-panel-title">Add Safety Information</div>
+          <div class="form-group"><label class="form-label">Section Title</label><input id="safetyTitle" class="form-input" placeholder="e.g. Muster Station Locations"></div>
+          <div class="form-group"><label class="form-label">Content</label><textarea id="safetyBody" class="form-textarea" placeholder="Enter safety information..."></textarea></div>
+          <div class="form-actions">
+            <button class="btn-gold" onclick="addSafetyInfo()">Save</button>
+            <button class="btn-outline" onclick="hideForm('addSafetyForm')">Cancel</button>
+          </div>
+        </div>
+
+        <div id="safetyList"></div>
+      </div>
+    </div>
+
+    <!-- ── SPA ── -->
+    <div class="view" id="view-spa" role="tabpanel">
+      <div class="spa-hero">
+        <div class="spa-icon">🌿</div>
+        <div class="spa-title">The Odyssey Spa</div>
+        <div class="spa-sub">Deck 3 · Open daily · Extension 63 · All prices in USD</div>
+      </div>
+
+      <div class="view-inner">
+
+        <!-- ADMIN: Add treatment -->
+        <div id="addTreatmentBtn" class="admin-only" style="margin-bottom:16px">
+          <button class="btn-gold btn-sm" onclick="toggleForm('addTreatmentForm')">+ Add Treatment</button>
+        </div>
+        <div id="addTreatmentForm" class="admin-panel" style="display:none">
+          <div class="admin-panel-title">Add Spa Treatment</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Treatment Name</label>
+              <input id="txName" class="form-input" placeholder="e.g. Hot Stone Massage">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="txCat" class="form-select">
+                <option value="massage">Massage</option>
+                <option value="facial">Facial</option>
+                <option value="body">Body</option>
+                <option value="wellness">Wellness</option>
+                <option value="salon">Salon</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Duration</label>
+              <input id="txDuration" class="form-input" placeholder="e.g. 60 min">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Price</label>
+              <input id="txPrice" class="form-input" placeholder="e.g. $150">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="txDesc" class="form-textarea" placeholder="Brief description of the treatment..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-gold" onclick="addTreatment()">Add Treatment</button>
+            <button class="btn-outline" onclick="hideForm('addTreatmentForm')">Cancel</button>
+          </div>
+        </div>
+
+        <!-- SPA MENU -->
+        <div class="section-header">
+          <div>
+            <div class="section-title">Spa Menu</div>
+            <div class="section-sub">All treatments include access to thermal facilities</div>
+          </div>
+        </div>
+
+        <div id="spaMenuList"></div>
+
+        <!-- APPOINTMENT REQUEST -->
+        <div class="spa-appt-section">
+          <div class="section-title" style="margin-bottom:6px">Request an Appointment</div>
+          <div class="section-sub" style="margin-bottom:20px">Our spa team will confirm your booking · Deck 3 · Ext 63</div>
+
+          <div class="admin-panel" style="background:var(--white)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Your Name</label>
+                <input id="apptName" class="form-input" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cabin / Residence</label>
+                <input id="apptCabin" class="form-input" placeholder="e.g. Deck 8, Cabin 14">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Treatment</label>
+              <select id="apptTreatment" class="form-select">
+                <option value="">Select a treatment...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Preferred Date</label>
+                <input id="apptDate" class="form-input" type="date">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Preferred Time</label>
+                <select id="apptTime" class="form-select">
+                  <option>8:00 AM</option>
+                  <option>9:00 AM</option>
+                  <option>10:00 AM</option>
+                  <option>11:00 AM</option>
+                  <option>12:00 PM</option>
+                  <option>1:00 PM</option>
+                  <option>2:00 PM</option>
+                  <option>3:00 PM</option>
+                  <option>4:00 PM</option>
+                  <option>5:00 PM</option>
+                  <option>6:00 PM</option>
+                  <option>7:00 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Special Requests or Health Notes</label>
+              <textarea id="apptNotes" class="form-textarea" placeholder="e.g. Allergies, injuries, preferences..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn-gold" onclick="submitApptRequest()">Request Appointment</button>
+            </div>
+            <div id="apptConfirmation" class="appt-confirmation" style="display:none">
+              ✓ Your request has been received! The spa team will confirm your appointment within 2 hours. You can also visit us on Deck 3 or call extension 63.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── RENT VILLA VIE ── -->
+    <div class="view" id="view-rent" role="tabpanel">
+      <div class="rent-hero">
+        <div class="rent-icon">🏠</div>
+        <div class="rent-title">Rent Villa Vie</div>
+        <div class="rent-sub">Share the experience with friends &amp; family</div>
+      </div>
+      <div class="view-inner">
+        <div class="rent-card">
+          <div class="rent-card-body">
+            <div class="rent-card-title">Want to rent your villa?</div>
+            <div class="rent-card-desc">List your Villa Vie residence and share the experience with friends, family or guests while you travel the world.</div>
+            <a href="https://villavieresidences.com/rentvillavie" target="_blank" rel="noopener noreferrer" class="btn-rent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Find Out More
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── CHAT ── -->
+    <div class="view" id="view-chat" role="tabpanel">
+      <div class="chat-header-bar">
+        <div class="chat-channels">
+          <button class="chat-channel-btn active" id="channelBtnGeneral" onclick="switchChannel('general')">
+            🌊 Resident Chat
+          </button>
+          <button class="chat-channel-btn" id="channelBtnSupport" onclick="switchChannel('support')">
+            🛎 Crew Support
+          </button>
+        </div>
+        <div class="chat-channel-desc" id="chatChannelDesc">Open community chat for all residents</div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-loading">Loading messages…</div>
+      </div>
+
+      <div class="chat-composer" id="chatComposer">
+        <div id="chatImagePreview" style="display:none"></div>
+        <div class="chat-composer-inner">
+          <label class="chat-img-btn" title="Share image">
+            <input type="file" accept="image/*" style="display:none" onchange="handleChatImageSelect(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+          </label>
+          <input id="chatInput" class="chat-input" type="text" placeholder="Type a message or @name…" maxlength="500" autocomplete="off">
+          <button class="chat-send-btn" onclick="sendChatMessage()" id="chatSendBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- VENUES -->
+    <div class="view" id="view-venues" role="tabpanel">
+      <div class="venues-hero"><div class="venues-icon">&#127963;</div><div class="venues-title">Venue Reservations</div><div class="venues-sub">Reserve a private space aboard the Odyssey</div></div>
+      <div class="view-inner">
+        <div class="venue-grid">
+          <div class="venue-card" onclick="selectVenue('The Drawing Room')"><div class="venue-card-icon">&#128715;</div><div class="venue-card-name">The Drawing Room</div><div class="venue-card-cap">Up to 30 guests</div></div>
+          <div class="venue-card" onclick="selectVenue('Sky Bar')"><div class="venue-card-icon">&#127749;</div><div class="venue-card-name">Sky Bar &amp; Terrace</div><div class="venue-card-cap">Up to 50 guests</div></div>
+          <div class="venue-card" onclick="selectVenue('The Theatre')"><div class="venue-card-icon">&#127917;</div><div class="venue-card-name">The Theatre</div><div class="venue-card-cap">Up to 80 guests</div></div>
+          <div class="venue-card" onclick="selectVenue('Private Dining Room')"><div class="venue-card-icon">&#127374;</div><div class="venue-card-name">Private Dining Room</div><div class="venue-card-cap">Up to 20 guests</div></div>
+          <div class="venue-card" onclick="selectVenue('Lido Pool Deck')"><div class="venue-card-icon">&#127944;</div><div class="venue-card-name">Lido Pool Deck</div><div class="venue-card-cap">Up to 100 guests</div></div>
+          <div class="venue-card" onclick="selectVenue('Atrium')"><div class="venue-card-icon">&#10024;</div><div class="venue-card-name">Atrium</div><div class="venue-card-cap">Up to 60 guests</div></div>
+        </div>
+        <div class="section-header" style="margin-top:28px"><div><div class="section-title">Reservation Request</div><div class="section-sub">Our hotel team will confirm within 24 hours</div></div></div>
+        <div class="admin-panel" style="background:var(--white)">
+          <div class="form-row"><div class="form-group"><label class="form-label">Your Name *</label><input id="venName" class="form-input" type="text" placeholder="Full name"></div><div class="form-group"><label class="form-label">Cabin *</label><input id="venCabin" class="form-input" type="text" placeholder="e.g. Deck 8, Cabin 14"></div></div>
+          <div class="form-group"><label class="form-label">Venue *</label><select id="venVenue" class="form-select"><option value="">Select a venue...</option><option>The Drawing Room</option><option>Sky Bar &amp; Terrace</option><option>The Theatre</option><option>Private Dining Room</option><option>Lido Pool Deck</option><option>Atrium</option><option>Other</option></select></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Date *</label><input id="venDate" class="form-input" type="date"></div><div class="form-group"><label class="form-label">Time</label><input id="venTime" class="form-input" type="text" placeholder="e.g. 7:00 PM - 10:00 PM"></div></div>
+          <div class="form-group"><label class="form-label">Equipment Needed</label>
+            <div class="equipment-grid">
+              <label class="equipment-item"><input type="checkbox" value="AV / Projector" onchange="updateEquipment()"> AV / Projector</label>
+              <label class="equipment-item"><input type="checkbox" value="Microphone" onchange="updateEquipment()"> Microphone</label>
+              <label class="equipment-item"><input type="checkbox" value="Sound System" onchange="updateEquipment()"> Sound System</label>
+              <label class="equipment-item"><input type="checkbox" value="Bar Service" onchange="updateEquipment()"> Bar Service</label>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">Notes</label><textarea id="venNotes" class="form-textarea" placeholder="Event type, guests, requirements..."></textarea></div>
+          <div class="form-actions"><button class="btn-gold" onclick="submitVenueRequest()" id="venSubmitBtn">Send Request</button></div>
+          <div id="venConfirmation" class="venue-confirmation" style="display:none">Your request has been sent to hotel_director@vvodyssey.com. You will receive confirmation within 24 hours.</div>
+          <div id="venError" class="venue-error" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAV — 4 tabs only -->
+  <div id="bottomNav">
+    <button class="bnav-btn active" onclick="switchTab('itinerary',this);syncTopNav('itinerary')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      <span>Itinerary</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('schedule',this);syncTopNav('schedule')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span>Schedule</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('updates',this);syncTopNav('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M15 17H20L18.6 15.6A9 9 0 0019 13 7 7 0 105 13a9 9 0 00.4 2.6L4 17h5M12 21v-4"/></svg>
+      <span>Updates</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('safety',this);syncTopNav('safety')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Safety</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('spa',this);syncTopNav('spa')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7 7 7z"/><path d="M9 9h2v6H9zm4 0h2v6h-2z"/></svg>
+      <span>Spa</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('venues',this);syncTopNav('venues')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <span>Venues</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('rent',this);syncTopNav('rent')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <span>Rent</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('chat',this);syncTopNav('chat')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>Chat</span>
+    </button>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="app.js"></script>
+<script src="ports.js"></script>
+<script src="auth.js"></script>
+<script src="chat.js"></script>
+<script>
+  // Unregister all service workers - prevents caching issues in Chrome
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(r => r.unregister());
+      console.log(`Unregistered ${regs.length} service workers`);
+    });
+  }
+</script>
+</body>
+</html>
