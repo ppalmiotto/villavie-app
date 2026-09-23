@@ -12,6 +12,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 var sbClient = null;
 
 function initSupabase() {
+  // Guard: never create more than one client
+  if (sbClient && typeof sbClient.from === 'function') return true;
   // Supabase v2 CDN exposes createClient at window.supabase.createClient
   const factory = window.supabase?.createClient || window.supabaseJs?.createClient;
   if (!factory) {
