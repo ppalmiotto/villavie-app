@@ -207,22 +207,54 @@ function addTreatment() {
   showToast('Treatment added ✓');
 }
 
-function submitApptRequest() {
-  const name = document.getElementById('apptName').value.trim();
-  const cabin = document.getElementById('apptCabin').value.trim();
-  const treatment = document.getElementById('apptTreatment').value;
-  const date = document.getElementById('apptDate').value;
-  const time = document.getElementById('apptTime').value;
-  if (!name || !treatment || !date) { showToast('Please fill in your name, treatment and date'); return; }
-  // Show confirmation
-  document.getElementById('apptConfirmation').style.display = 'block';
-  // Clear form
-  ['apptName','apptCabin','apptNotes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('apptTreatment').value = '';
-  document.getElementById('apptDate').value = '';
-  showToast('Appointment request sent ✓');
-  // Scroll to confirmation
-  document.getElementById('apptConfirmation').scrollIntoView({ behavior: 'smooth', block: 'center' });
+async function submitApptRequest() {
+  var name      = document.getElementById('apptName').value.trim();
+  var cabin     = document.getElementById('apptCabin').value.trim();
+  var treatment = document.getElementById('apptTreatment').value;
+  var date      = document.getElementById('apptDate').value;
+  var time      = document.getElementById('apptTime').value;
+  var notes     = document.getElementById('apptNotes') ? document.getElementById('apptNotes').value.trim() : '';
+  var confEl    = document.getElementById('apptConfirmation');
+  var submitBtn = document.querySelector('[onclick="submitApptRequest()"]');
+
+  if (!name || !treatment || !date) {
+    showToast('Please fill in your name, treatment and date');
+    return;
+  }
+
+  if (submitBtn) { submitBtn.textContent = 'Sending...'; submitBtn.disabled = true; }
+
+  var params = {
+    to_email:     'hotel_director@vvodyssey.com',
+    from_name:    name,
+    cabin:        cabin || 'Not specified',
+    treatment:    treatment,
+    date:         new Date(date).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+    time:         time || 'No preference',
+    notes:        notes || 'None',
+    submitted_at: new Date().toLocaleString('en-GB')
+  };
+
+  try {
+    if (!_emailJsReady) throw new Error('EmailJS not ready');
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    if (confEl) confEl.style.display = 'block';
+    if (submitBtn) submitBtn.textContent = 'Request Sent ✓';
+    showToast('Appointment request sent ✓');
+    ['apptName','apptCabin','apptNotes'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('apptTreatment').value = '';
+    document.getElementById('apptDate').value = '';
+    if (confEl) confEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch(err) {
+    console.error('Spa EmailJS error:', err);
+    // Fallback - show confirmation anyway
+    if (confEl) confEl.style.display = 'block';
+    if (submitBtn) { submitBtn.textContent = 'Request Appointment'; submitBtn.disabled = false; }
+    showToast('Request received — we will confirm shortly');
+    if (confEl) confEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 // ── SAFETY DATA ───────────────────────────────
