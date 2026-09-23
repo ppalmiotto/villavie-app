@@ -289,6 +289,8 @@ function renderPorts() {
   var el = document.getElementById('portList');
   var titleEl = document.getElementById('itinMonthTitle');
   var countEl = document.getElementById('voyagePortCount');
+  var voyageTitleEl = document.getElementById('voyageTitle');
+  if (voyageTitleEl) voyageTitleEl.textContent = activeSegment || 'World Odyssey 2026-2030';
   if (!el) return;
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   if (titleEl) titleEl.textContent = monthNames[itinMonth] + ' ' + itinYear;
@@ -386,6 +388,22 @@ window.createPoll = createPoll;
 window.castVote = castVote;
 window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
+
+
+// ── RENDER SCHEDULE ──────────────────────────
+function renderSchedule(dayIndex) {
+  var events = scheduleData[dayIndex] || [];
+  var el = document.getElementById('eventList');
+  if (!el) return;
+  if (!events.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
+    return;
+  }
+  el.innerHTML = events.map(function(e) {
+    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
+  }).join('');
+}
+window.renderSchedule = renderSchedule;
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -531,6 +549,22 @@ window.createPoll = createPoll;
 window.castVote = castVote;
 window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
+
+
+// ── RENDER SCHEDULE ──────────────────────────
+function renderSchedule(dayIndex) {
+  var events = scheduleData[dayIndex] || [];
+  var el = document.getElementById('eventList');
+  if (!el) return;
+  if (!events.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
+    return;
+  }
+  el.innerHTML = events.map(function(e) {
+    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
+  }).join('');
+}
+window.renderSchedule = renderSchedule;
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -804,6 +838,22 @@ window.createPoll = createPoll;
 window.castVote = castVote;
 window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
+
+
+// ── RENDER SCHEDULE ──────────────────────────
+function renderSchedule(dayIndex) {
+  var events = scheduleData[dayIndex] || [];
+  var el = document.getElementById('eventList');
+  if (!el) return;
+  if (!events.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
+    return;
+  }
+  el.innerHTML = events.map(function(e) {
+    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
+  }).join('');
+}
+window.renderSchedule = renderSchedule;
 
 window.addEventListener('DOMContentLoaded', init);
 
