@@ -206,52 +206,153 @@
 
     <!-- ── SCHEDULE ── -->
     <div class="view" id="view-schedule" role="tabpanel">
-      <div class="view-inner">
-        <div class="section-header">
-          <div>
-            <div class="section-title">Daily Schedule</div>
-            <div class="section-sub" id="scheduleDate"></div>
-          </div>
-          <div id="addEventBtn" class="admin-only">
-            <button class="btn-gold btn-sm" onclick="toggleForm('addEventForm')">+ Event</button>
-          </div>
-        </div>
 
-        <div id="addEventForm" class="admin-panel" style="display:none">
-          <div class="admin-panel-title">Add Event</div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Time</label><input id="evTime" class="form-input" placeholder="09:00 AM"></div>
-            <div class="form-group">
-              <label class="form-label">Category</label>
-              <select id="evCat" class="form-select">
-                <option value="activity">Activity</option>
-                <option value="dining">Dining</option>
-                <option value="entertainment">Entertainment</option>
-                <option value="wellness">Wellness</option>
-                <option value="port">Port</option>
-              </select>
+      <!-- Schedule sub-tab nav -->
+      <div class="combined-tab-nav">
+        <button class="combined-tab-btn active" id="subTabSchedule" onclick="switchSubTab('schedule-content','subTabSchedule')">📅 Events</button>
+        <button class="combined-tab-btn" id="subTabMenu" onclick="switchSubTab('menu-content','subTabMenu')">🍽️ Menu</button>
+      </div>
+
+      <!-- EVENTS CONTENT -->
+      <div id="schedule-content" class="sub-tab-content active">
+        <div class="view-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Daily Events</div>
+              <div class="section-sub" id="scheduleDate"></div>
+            </div>
+            <div id="addEventBtn" class="admin-only">
+              <button class="btn-gold btn-sm" onclick="toggleForm('addEventForm')">+ Event</button>
             </div>
           </div>
-          <div class="form-group"><label class="form-label">Title</label><input id="evTitle" class="form-input" placeholder="e.g. Morning yoga on deck"></div>
-          <div class="form-group"><label class="form-label">Location / Details</label><input id="evLocation" class="form-input" placeholder="e.g. Sun Deck, Level 10"></div>
-          <div class="form-actions">
-            <button class="btn-gold" onclick="addEvent()">Add Event</button>
-            <button class="btn-outline" onclick="hideForm('addEventForm')">Cancel</button>
+
+          <div id="addEventForm" class="admin-panel" style="display:none">
+            <div class="admin-panel-title">Add Event</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Time</label><input id="evTime" class="form-input" type="text" placeholder="e.g. 7:00 PM"></div>
+              <div class="form-group"><label class="form-label">Category</label>
+                <select id="evCat" class="form-select">
+                  <option value="activity">Activity</option>
+                  <option value="dining">Dining</option>
+                  <option value="entertainment">Entertainment</option>
+                  <option value="wellness">Wellness</option>
+                  <option value="port">Port</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Title</label><input id="evTitle" class="form-input" placeholder="e.g. Cocktail Hour"></div>
+              <div class="form-group"><label class="form-label">Location / Details</label><input id="evLocation" class="form-input" placeholder="Sky Bar, Level 12"></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-gold" onclick="addEvent()">Add Event</button>
+              <button class="btn-outline" onclick="hideForm('addEventForm')">Cancel</button>
+            </div>
           </div>
-        </div>
 
-        <div class="day-nav" id="dayNav">
-          <button class="day-btn active" onclick="selectDay(0,this)">Today</button>
-          <button class="day-btn" onclick="selectDay(1,this)">Thu 22</button>
-          <button class="day-btn" onclick="selectDay(2,this)">Fri 23</button>
-          <button class="day-btn" onclick="selectDay(3,this)">Sat 24</button>
-          <button class="day-btn" onclick="selectDay(4,this)">Sun 25</button>
-        </div>
+          <div class="day-nav">
+            <button class="day-btn active" id="dayBtn0" onclick="selectDay(0,this)">Today</button>
+            <button class="day-btn" id="dayBtn1" onclick="selectDay(1,this)">Thu 22</button>
+            <button class="day-btn" id="dayBtn2" onclick="selectDay(2,this)">Fri 23</button>
+            <button class="day-btn" id="dayBtn3" onclick="selectDay(3,this)">Sat 24</button>
+            <button class="day-btn" id="dayBtn4" onclick="selectDay(4,this)">Sun 25</button>
+          </div>
 
-        <div id="eventList"></div>
+          <div id="eventList"></div>
+        </div>
       </div>
-    </div>
 
+      <!-- MENU CONTENT -->
+      <div id="menu-content" class="sub-tab-content">
+        <div class="view-inner">
+
+          <!-- Admin: update menu -->
+          <div class="admin-only" style="margin-bottom:16px">
+            <button class="btn-gold btn-sm" onclick="toggleForm('editMenuForm')">✏️ Edit Menu</button>
+          </div>
+          <div id="editMenuForm" class="admin-panel" style="display:none">
+            <div class="admin-panel-title">Update Today's Menu</div>
+            <div class="form-group">
+              <label class="form-label">Breakfast</label>
+              <textarea id="menuBreakfast" class="form-textarea" placeholder="e.g. Continental buffet · Eggs Benedict · Fresh fruit station"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lunch</label>
+              <textarea id="menuLunch" class="form-textarea" placeholder="e.g. Poolside BBQ · Caesar salad · Chilled soups"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dinner</label>
+              <textarea id="menuDinner" class="form-textarea" placeholder="e.g. Gala dinner · Lobster thermidor · Sommelier's selection"></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn-gold" onclick="saveMenu()">Save Menu</button>
+              <button class="btn-outline" onclick="hideForm('editMenuForm')">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Menu display -->
+          <div id="menuDisplay">
+            <div class="menu-section">
+              <div class="menu-meal-header">
+                <span class="menu-meal-icon">🌅</span>
+                <div>
+                  <div class="menu-meal-title">Breakfast</div>
+                  <div class="menu-meal-time">7:00 AM – 10:30 AM · The Grand Dining Room</div>
+                </div>
+              </div>
+              <div class="menu-items" id="menuBreakfastDisplay">
+                <div class="menu-item">Continental Buffet</div>
+                <div class="menu-item">Eggs Benedict with Smoked Salmon</div>
+                <div class="menu-item">Fresh Tropical Fruit Station</div>
+                <div class="menu-item">Freshly Baked Pastries & Breads</div>
+                <div class="menu-item">Juices, Teas & Specialty Coffees</div>
+              </div>
+            </div>
+
+            <div class="menu-section">
+              <div class="menu-meal-header">
+                <span class="menu-meal-icon">☀️</span>
+                <div>
+                  <div class="menu-meal-title">Lunch</div>
+                  <div class="menu-meal-time">12:30 PM – 2:30 PM · Lido Restaurant & Pool Deck</div>
+                </div>
+              </div>
+              <div class="menu-items" id="menuLunchDisplay">
+                <div class="menu-item">Poolside Barbecue</div>
+                <div class="menu-item">Classic Caesar Salad</div>
+                <div class="menu-item">Chilled Gazpacho</div>
+                <div class="menu-item">Grilled Fish of the Day</div>
+                <div class="menu-item">Artisan Dessert Selection</div>
+              </div>
+            </div>
+
+            <div class="menu-section">
+              <div class="menu-meal-header">
+                <span class="menu-meal-icon">🌙</span>
+                <div>
+                  <div class="menu-meal-title">Dinner</div>
+                  <div class="menu-meal-time">7:00 PM – 10:00 PM · The Grand Dining Room</div>
+                </div>
+              </div>
+              <div class="menu-items" id="menuDinnerDisplay">
+                <div class="menu-item">Amuse-Bouche from the Chef</div>
+                <div class="menu-item">Seared Scallops with Cauliflower Purée</div>
+                <div class="menu-item">Lobster Bisque</div>
+                <div class="menu-item">Prime Beef Tenderloin · Pan-seared Sea Bass</div>
+                <div class="menu-item">Soufflé du Jour · Cheese Selection</div>
+              </div>
+            </div>
+
+            <div class="menu-note">
+              Menus change daily. Please inform your server of any dietary requirements. 
+              Room service available 24 hours — dial extension 200.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
     <!-- ── UPDATES ── -->
     <div class="view" id="view-updates" role="tabpanel">
       <div class="combined-tab-nav">

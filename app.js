@@ -991,3 +991,37 @@ setInterval(function() {
       if (typeof initSupabase === 'function') initSupabase();
     });
 }, 4 * 60 * 1000);
+
+// ── DINING MENU ──────────────────────────────
+var menuData = {
+  breakfast: ['Continental Buffet', 'Eggs Benedict with Smoked Salmon', 'Fresh Tropical Fruit Station', 'Freshly Baked Pastries & Breads', 'Juices, Teas & Specialty Coffees'],
+  lunch: ['Poolside Barbecue', 'Classic Caesar Salad', 'Chilled Gazpacho', 'Grilled Fish of the Day', 'Artisan Dessert Selection'],
+  dinner: ['Amuse-Bouche from the Chef', 'Seared Scallops with Cauliflower Purée', 'Lobster Bisque', 'Prime Beef Tenderloin · Pan-seared Sea Bass', 'Soufflé du Jour · Cheese Selection']
+};
+
+function saveMenu() {
+  var breakfast = document.getElementById('menuBreakfast').value.trim();
+  var lunch = document.getElementById('menuLunch').value.trim();
+  var dinner = document.getElementById('menuDinner').value.trim();
+
+  function updateSection(text, elId) {
+    if (!text) return;
+    var el = document.getElementById(elId);
+    if (!el) return;
+    var items = text.split('\n').filter(function(l) { return l.trim(); });
+    el.innerHTML = items.map(function(item) {
+      return '<div class="menu-item">' + item.trim().replace(/^[·•-]\s*/, '') + '</div>';
+    }).join('');
+  }
+
+  updateSection(breakfast, 'menuBreakfastDisplay');
+  updateSection(lunch, 'menuLunchDisplay');
+  updateSection(dinner, 'menuDinnerDisplay');
+
+  hideForm('editMenuForm');
+  document.getElementById('menuBreakfast').value = '';
+  document.getElementById('menuLunch').value = '';
+  document.getElementById('menuDinner').value = '';
+  showToast('Menu updated ✓');
+}
+window.saveMenu = saveMenu;
