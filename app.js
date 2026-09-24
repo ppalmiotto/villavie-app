@@ -207,54 +207,22 @@ function addTreatment() {
   showToast('Treatment added ✓');
 }
 
-async function submitApptRequest() {
-  var name      = document.getElementById('apptName').value.trim();
-  var cabin     = document.getElementById('apptCabin').value.trim();
-  var treatment = document.getElementById('apptTreatment').value;
-  var date      = document.getElementById('apptDate').value;
-  var time      = document.getElementById('apptTime').value;
-  var notes     = document.getElementById('apptNotes') ? document.getElementById('apptNotes').value.trim() : '';
-  var confEl    = document.getElementById('apptConfirmation');
-  var submitBtn = document.querySelector('[onclick="submitApptRequest()"]');
-
-  if (!name || !treatment || !date) {
-    showToast('Please fill in your name, treatment and date');
-    return;
-  }
-
-  if (submitBtn) { submitBtn.textContent = 'Sending...'; submitBtn.disabled = true; }
-
-  var params = {
-    to_email:     'hotel_director@vvodyssey.com',
-    from_name:    name,
-    cabin:        cabin || 'Not specified',
-    treatment:    treatment,
-    date:         new Date(date).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
-    time:         time || 'No preference',
-    notes:        notes || 'None',
-    submitted_at: new Date().toLocaleString('en-GB')
-  };
-
-  try {
-    if (!_emailJsReady) throw new Error('EmailJS not ready');
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
-    if (confEl) confEl.style.display = 'block';
-    if (submitBtn) submitBtn.textContent = 'Request Sent ✓';
-    showToast('Appointment request sent ✓');
-    ['apptName','apptCabin','apptNotes'].forEach(function(id) {
-      var el = document.getElementById(id); if (el) el.value = '';
-    });
-    document.getElementById('apptTreatment').value = '';
-    document.getElementById('apptDate').value = '';
-    if (confEl) confEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } catch(err) {
-    console.error('Spa EmailJS error:', err);
-    // Fallback - show confirmation anyway
-    if (confEl) confEl.style.display = 'block';
-    if (submitBtn) { submitBtn.textContent = 'Request Appointment'; submitBtn.disabled = false; }
-    showToast('Request received — we will confirm shortly');
-    if (confEl) confEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+function submitApptRequest() {
+  const name = document.getElementById('apptName').value.trim();
+  const cabin = document.getElementById('apptCabin').value.trim();
+  const treatment = document.getElementById('apptTreatment').value;
+  const date = document.getElementById('apptDate').value;
+  const time = document.getElementById('apptTime').value;
+  if (!name || !treatment || !date) { showToast('Please fill in your name, treatment and date'); return; }
+  // Show confirmation
+  document.getElementById('apptConfirmation').style.display = 'block';
+  // Clear form
+  ['apptName','apptCabin','apptNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('apptTreatment').value = '';
+  document.getElementById('apptDate').value = '';
+  showToast('Appointment request sent ✓');
+  // Scroll to confirmation
+  document.getElementById('apptConfirmation').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // ── SAFETY DATA ───────────────────────────────
@@ -1057,3 +1025,99 @@ function saveMenu() {
   showToast('Menu updated ✓');
 }
 window.saveMenu = saveMenu;
+
+function renderUpdates() {
+  const el = document.getElementById('updateList');
+  if (!el) return;
+  const catClass = { announcement: 'cat-announcement', dining: 'cat-dining', activities: 'cat-activities', general: 'cat-general' };
+  el.innerHTML = updates.map(u => `
+    <div class="update-card">
+      <div class="update-meta">
+        <span class="update-category ${catClass[u.category]}">${u.category}</span>
+        <span class="update-time">${u.time}</span>
+      </div>
+      <div class="update-title">${u.title}</div>
+      <div class="update-body">${u.body}</div>
+    </div>
+  `).join('');
+}
+
+window.renderUpdates = renderUpdates;
+
+function renderSafety() {
+  const el = document.getElementById('safetyList');
+  if (!el) return;
+  el.innerHTML = safetyData.map((s, i) => `
+    <div class="safety-card">
+      <div class="safety-card-header" onclick="toggleSafety(${i})">
+        <span class="safety-card-icon">${s.icon}</span>
+        <span class="safety-card-title">${s.title}</span>
+        <span class="safety-card-chevron" id="chevron-${i}">${s.open ? '▲' : '▼'}</span>
+      </div>
+      <div class="safety-card-body ${s.open ? 'open' : ''}" id="safety-body-${i}">${s.content}</div>
+    </div>
+  `).join('');
+}
+
+window.renderSafety = renderSafety;
+
+function renderEmergencyMessages() {
+  const el = document.getElementById('emergencyMessageList');
+  const divider = document.getElementById('updatesDivider');
+  if (!el) return;
+
+  const active = emergencyMessages.filter(m => m.active);
+  const resolved = emergencyMessages.filter(m => !m.active);
+
+  // Show divider only when there are emergency messages
+  if (divider) divider.style.display = emergencyMessages.length > 0 ? 'flex' : 'none';
+
+  if (emergencyMessages.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  if (active.length > 0) {
+    html += `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#b91c1c;margin-bottom:10px">🚨 Active Emergency Alerts</div>`;
+    active.forEach(m => {
+      const idx = emergencyMessages.indexOf(m);
+      html += `
+        <div class="emg-message-card">
+          <div class="emg-message-header">
+            <span class="emg-message-icon">🚨</span>
+            <span class="emg-message-title">${m.title}</span>
+          </div>
+          <div class="emg-message-body">${m.body}</div>
+          <div class="emg-message-meta">
+            <span>Issued ${m.time}</span>
+            ${isAdmin ? `<button onclick="resolveAlert(${idx})" style="margin-left:auto;background:#b91c1c;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">✓ Mark Resolved</button>` : ''}
+          </div>
+        </div>`;
+    });
+  }
+
+  if (resolved.length > 0) {
+    html += `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-light);margin:16px 0 10px">Past Alerts</div>`;
+    resolved.forEach(m => {
+      html += `
+        <div class="emg-message-card resolved">
+          <div class="emg-message-header">
+            <span class="emg-message-icon">📋</span>
+            <span class="emg-message-title resolved">${m.title}</span>
+            <span class="emg-resolved-badge">Resolved</span>
+          </div>
+          <div class="emg-message-body resolved">${m.body}</div>
+          <div class="emg-message-meta resolved"><span>Issued ${m.time}</span></div>
+        </div>`;
+    });
+  }
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+//  INTERACTIONS
+// ═══════════════════════════════════════════════
+
+window.renderEmergencyMessages = renderEmergencyMessages;
