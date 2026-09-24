@@ -1215,3 +1215,10 @@ main { flex: 1; overflow-y: auto; }
 .menu-item:last-child { border-bottom:none; }
 .menu-item::before { content:'·'; color:var(--gold); margin-right:8px; font-size:18px; vertical-align:-2px; }
 .menu-note { font-size:12px; color:var(--text-light); line-height:1.6; text-align:center; padding:16px 20px 8px; border-top:1px solid var(--cream-dark); margin-top:4px; }
+
+/* ─── HEADER LOGO IMAGE ─── */
+.header-logo-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
