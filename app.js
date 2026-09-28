@@ -155,42 +155,37 @@ const catIcons = { massage: '💆', facial: '✨', ritual: '🌿', enhancement: 
 const catLabels = { massage: 'Massage', facial: 'Facials', ritual: 'Rituals', enhancement: 'Enhancements', salon: 'Hair Salon', beauty: 'Beauty' };
 
 function renderSpaMenu() {
-  const el = document.getElementById('spaMenuList');
+  var el = document.getElementById('spaMenuList');
   if (!el) return;
 
   // Group by category
-  const grouped = {};
-  spaMenu.forEach(t => {
+  var grouped = {};
+  spaMenu.forEach(function(t) {
     if (!grouped[t.category]) grouped[t.category] = [];
     grouped[t.category].push(t);
   });
 
-  let html = '';
-  Object.keys(grouped).forEach(cat => {
-    html += `<div class="spa-category-label">${catLabels[cat] || cat}</div>`;
-    grouped[cat].forEach(t => {
-      html += `
-        <div class="spa-treatment-card">
-          <div class="spa-treatment-icon">${t.icon}</div>
-          <div class="spa-treatment-body">
-            <div class="spa-treatment-name">${t.name}</div>
-            <div class="spa-treatment-desc">${t.desc}</div>
-            <div class="spa-treatment-meta">
-              <span class="spa-tag">⏱ ${t.duration}</span>
-              <span class="spa-tag spa-tag-price">${t.price}</span>
-            </div>
-          </div>
-        </div>`;
+  var html = '';
+  Object.keys(grouped).forEach(function(cat) {
+    html += '<div class="spa-category-label">' + (catLabels[cat] || cat) + '</div>';
+    grouped[cat].forEach(function(t) {
+      var safeName = t.name.replace(/'/g, "\\'");
+      html += '<div class="spa-treatment-card">' +
+        '<div class="spa-treatment-icon">' + t.icon + '</div>' +
+        '<div class="spa-treatment-body">' +
+          '<div class="spa-treatment-name">' + t.name + '</div>' +
+          '<div class="spa-treatment-desc">' + t.desc + '</div>' +
+          '<div class="spa-treatment-meta">' +
+            '<span class="spa-tag">⏱ ' + t.duration + '</span>' +
+            '<span class="spa-tag spa-tag-price">' + t.price + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<button class="spa-add-btn" data-name="' + t.name + '" data-duration="' + t.duration + '" data-price="' + t.price + '" onclick="handleSpaAdd(this)">+ Add</button>' +
+      '</div>';
     });
   });
   el.innerHTML = html;
-
-  // Populate treatment dropdown
-  const sel = document.getElementById('apptTreatment');
-  if (sel) {
-    sel.innerHTML = '<option value="">Select a treatment...</option>' +
-      spaMenu.map(t => `<option value="${t.name}">${t.name} (${t.duration} · ${t.price})</option>`).join('');
-  }
+  updateSpaCartUI();
 }
 
 function addTreatment() {

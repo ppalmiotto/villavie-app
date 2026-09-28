@@ -500,26 +500,30 @@
     <!-- ── SPA ── -->
     <div class="view" id="view-spa" role="tabpanel">
       <div class="spa-hero">
-        <div class="spa-icon">🌿</div>
-        <div class="spa-title">The Odyssey Spa</div>
-        <div class="spa-sub">Deck 3 · Open daily · Extension 63 · All prices in USD</div>
+        <div class="spa-hero-content">
+          <div class="spa-title">The Spa</div>
+          <div class="spa-sub">Aboard Villa Vie Odyssey</div>
+        </div>
+      </div>
+
+      <!-- CART BUTTON (floating) -->
+      <div id="spaCart" class="spa-cart" style="display:none" onclick="openSpaCart()">
+        <span class="spa-cart-icon">🛒</span>
+        <span class="spa-cart-count" id="spaCartCount">0</span>
+        <span class="spa-cart-label">View Selection</span>
       </div>
 
       <div class="view-inner">
 
         <!-- ADMIN: Add treatment -->
-        <div id="addTreatmentBtn" class="admin-only" style="margin-bottom:16px">
+        <div class="admin-only" style="margin-bottom:16px">
           <button class="btn-gold btn-sm" onclick="toggleForm('addTreatmentForm')">+ Add Treatment</button>
         </div>
         <div id="addTreatmentForm" class="admin-panel" style="display:none">
           <div class="admin-panel-title">Add Spa Treatment</div>
           <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Treatment Name</label>
-              <input id="txName" class="form-input" placeholder="e.g. Hot Stone Massage">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Category</label>
+            <div class="form-group"><label class="form-label">Treatment Name</label><input id="txName" class="form-input" placeholder="e.g. Hot Stone Massage"></div>
+            <div class="form-group"><label class="form-label">Category</label>
               <select id="txCat" class="form-select">
                 <option value="massage">Massage</option>
                 <option value="facial">Facial</option>
@@ -530,97 +534,70 @@
             </div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Duration</label>
-              <input id="txDuration" class="form-input" placeholder="e.g. 60 min">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Price</label>
-              <input id="txPrice" class="form-input" placeholder="e.g. $150">
-            </div>
+            <div class="form-group"><label class="form-label">Duration</label><input id="txDur" class="form-input" placeholder="e.g. 60 min"></div>
+            <div class="form-group"><label class="form-label">Price</label><input id="txPrice" class="form-input" placeholder="e.g. $150"></div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea id="txDesc" class="form-textarea" placeholder="Brief description of the treatment..."></textarea>
-          </div>
+          <div class="form-group"><label class="form-label">Description</label><textarea id="txDesc" class="form-textarea" placeholder="Brief description..."></textarea></div>
           <div class="form-actions">
-            <button class="btn-gold" onclick="addTreatment()">Add Treatment</button>
+            <button class="btn-gold" onclick="addTreatment()">Add</button>
             <button class="btn-outline" onclick="hideForm('addTreatmentForm')">Cancel</button>
           </div>
         </div>
 
         <!-- SPA MENU -->
         <div class="section-header">
-          <div>
-            <div class="section-title">Spa Menu</div>
-            <div class="section-sub">All treatments include access to thermal facilities</div>
+          <div><div class="section-title">Spa Menu</div><div class="section-sub">All treatments include access to thermal facilities</div></div>
+        </div>
+        <div id="spaMenuList"></div>
+
+        <!-- CART / APPOINTMENT FORM -->
+        <div id="spaCartPanel" class="spa-cart-panel" style="display:none">
+          <div class="spa-cart-header">
+            <div class="section-title">Your Selection</div>
+            <button class="btn-outline btn-sm" onclick="closeSpaCart()">✕ Close</button>
+          </div>
+          <div id="spaCartItems" class="spa-cart-items"></div>
+          <div class="spa-cart-actions">
+            <button class="btn-gold" onclick="proceedToBook()">Book These Treatments →</button>
           </div>
         </div>
 
-        <div id="spaMenuList"></div>
-
-        <!-- APPOINTMENT REQUEST -->
-        <div class="spa-appt-section">
-          <div class="section-title" style="margin-bottom:6px">Request an Appointment</div>
-          <div class="section-sub" style="margin-bottom:20px">Our spa team will confirm your booking · Deck 3 · Ext 63</div>
-
+        <!-- APPOINTMENT FORM -->
+        <div class="spa-appt-section" id="spaApptSection">
+          <div class="section-header">
+            <div><div class="section-title">Request Appointment</div><div class="section-sub">We'll confirm your booking within 24 hours</div></div>
+          </div>
           <div class="admin-panel" style="background:var(--white)">
             <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Your Name</label>
-                <input id="apptName" class="form-input" placeholder="Full name">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Cabin / Residence</label>
-                <input id="apptCabin" class="form-input" placeholder="e.g. Deck 8, Cabin 14">
-              </div>
+              <div class="form-group"><label class="form-label">Your Name *</label><input id="apptName" class="form-input" placeholder="Full name"></div>
+              <div class="form-group"><label class="form-label">Cabin *</label><input id="apptCabin" class="form-input" placeholder="e.g. Deck 8, Cabin 14"></div>
             </div>
             <div class="form-group">
-              <label class="form-label">Treatment</label>
-              <select id="apptTreatment" class="form-select">
-                <option value="">Select a treatment...</option>
-              </select>
+              <label class="form-label">Selected Treatments *</label>
+              <div id="apptTreatmentList" class="spa-selected-list"></div>
+              <div style="font-size:12px;color:var(--text-light);margin-top:6px">Browse the menu above to add treatments</div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Preferred Date</label>
-                <input id="apptDate" class="form-input" type="date">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Preferred Time</label>
+              <div class="form-group"><label class="form-label">Preferred Date *</label><input id="apptDate" class="form-input" type="date"></div>
+              <div class="form-group"><label class="form-label">Preferred Time</label>
                 <select id="apptTime" class="form-select">
-                  <option>8:00 AM</option>
-                  <option>9:00 AM</option>
-                  <option>10:00 AM</option>
-                  <option>11:00 AM</option>
-                  <option>12:00 PM</option>
-                  <option>1:00 PM</option>
-                  <option>2:00 PM</option>
-                  <option>3:00 PM</option>
-                  <option>4:00 PM</option>
-                  <option>5:00 PM</option>
-                  <option>6:00 PM</option>
-                  <option>7:00 PM</option>
+                  <option value="">No preference</option>
+                  <option>Morning (9am–12pm)</option>
+                  <option>Afternoon (12pm–4pm)</option>
+                  <option>Evening (4pm–7pm)</option>
                 </select>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Special Requests or Health Notes</label>
-              <textarea id="apptNotes" class="form-textarea" placeholder="e.g. Allergies, injuries, preferences..."></textarea>
-            </div>
-            <div class="form-actions">
-              <button class="btn-gold" onclick="submitApptRequest()">Request Appointment</button>
-            </div>
+            <div class="form-group"><label class="form-label">Special Notes</label><textarea id="apptNotes" class="form-textarea" placeholder="Allergies, injuries, preferences..."></textarea></div>
+            <div class="form-actions"><button class="btn-gold" onclick="submitApptRequest()" id="apptSubmitBtn">Request Appointment</button></div>
             <div id="apptConfirmation" class="appt-confirmation" style="display:none">
-              ✓ Your request has been received! The spa team will confirm your appointment within 2 hours. You can also visit us on Deck 3 or call extension 63.
+              ✓ Your appointment request has been sent. The spa team will confirm within 24 hours.
             </div>
           </div>
         </div>
 
       </div>
     </div>
-
-
     <!-- ── RENT VILLA VIE ── -->
     <div class="view" id="view-rent" role="tabpanel">
       <div class="rent-hero">
