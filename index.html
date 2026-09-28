@@ -679,37 +679,96 @@
 
     <!-- VENUES -->
     <div class="view" id="view-venues" role="tabpanel">
-      <div class="venues-hero"><div class="venues-icon">&#127963;</div><div class="venues-title">Venue Reservations</div><div class="venues-sub">Reserve a private space aboard the Odyssey</div></div>
-      <div class="view-inner">
-        <div class="venue-grid">
-          <div class="venue-card" onclick="selectVenue('The Drawing Room')"><div class="venue-card-icon">&#128715;</div><div class="venue-card-name">The Drawing Room</div><div class="venue-card-cap">Up to 30 guests</div></div>
-          <div class="venue-card" onclick="selectVenue('Sky Bar')"><div class="venue-card-icon">&#127749;</div><div class="venue-card-name">Sky Bar &amp; Terrace</div><div class="venue-card-cap">Up to 50 guests</div></div>
-          <div class="venue-card" onclick="selectVenue('The Theatre')"><div class="venue-card-icon">&#127917;</div><div class="venue-card-name">The Theatre</div><div class="venue-card-cap">Up to 80 guests</div></div>
-          <div class="venue-card" onclick="selectVenue('Private Dining Room')"><div class="venue-card-icon">&#127374;</div><div class="venue-card-name">Private Dining Room</div><div class="venue-card-cap">Up to 20 guests</div></div>
-          <div class="venue-card" onclick="selectVenue('Lido Pool Deck')"><div class="venue-card-icon">&#127944;</div><div class="venue-card-name">Lido Pool Deck</div><div class="venue-card-cap">Up to 100 guests</div></div>
-          <div class="venue-card" onclick="selectVenue('Atrium')"><div class="venue-card-icon">&#10024;</div><div class="venue-card-name">Atrium</div><div class="venue-card-cap">Up to 60 guests</div></div>
+
+      <!-- Venue sub-tabs -->
+      <div class="combined-tab-nav" style="position:relative;top:auto;">
+        <button class="combined-tab-btn active" id="subTabVenueBook" onclick="switchSubTab('venue-booking','subTabVenueBook')">📅 Book a Venue</button>
+        <button class="combined-tab-btn" id="subTabVenueCal" onclick="switchSubTab('venue-calendar','subTabVenueCal');loadVenueCalendar()">🗓️ Calendar</button>
+        <button class="combined-tab-btn admin-only" id="subTabVenueAdmin" onclick="switchSubTab('venue-requests','subTabVenueAdmin');loadVenueRequests()">⚙️ Requests</button>
+      </div>
+
+      <!-- BOOKING FORM -->
+      <div id="venue-booking" class="sub-tab-content active">
+        <div class="venues-hero">
+          <div class="venues-icon">🏛️</div>
+          <div class="venues-title">Venue Reservations</div>
+          <div class="venues-sub">Reserve a private space aboard the Odyssey</div>
         </div>
-        <div class="section-header" style="margin-top:28px"><div><div class="section-title">Reservation Request</div><div class="section-sub">Our hotel team will confirm within 24 hours</div></div></div>
-        <div class="admin-panel" style="background:var(--white)">
-          <div class="form-row"><div class="form-group"><label class="form-label">Your Name *</label><input id="venName" class="form-input" type="text" placeholder="Full name"></div><div class="form-group"><label class="form-label">Cabin *</label><input id="venCabin" class="form-input" type="text" placeholder="e.g. Deck 8, Cabin 14"></div></div>
-          <div class="form-group"><label class="form-label">Venue *</label><select id="venVenue" class="form-select"><option value="">Select a venue...</option><option>The Drawing Room</option><option>Sky Bar &amp; Terrace</option><option>The Theatre</option><option>Private Dining Room</option><option>Lido Pool Deck</option><option>Atrium</option><option>Other</option></select></div>
-          <div class="form-row"><div class="form-group"><label class="form-label">Date *</label><input id="venDate" class="form-input" type="date"></div><div class="form-group"><label class="form-label">Time</label><input id="venTime" class="form-input" type="text" placeholder="e.g. 7:00 PM - 10:00 PM"></div></div>
-          <div class="form-group"><label class="form-label">Equipment Needed</label>
-            <div class="equipment-grid">
-              <label class="equipment-item"><input type="checkbox" value="AV / Projector" onchange="updateEquipment()"> AV / Projector</label>
-              <label class="equipment-item"><input type="checkbox" value="Microphone" onchange="updateEquipment()"> Microphone</label>
-              <label class="equipment-item"><input type="checkbox" value="Sound System" onchange="updateEquipment()"> Sound System</label>
-              <label class="equipment-item"><input type="checkbox" value="Bar Service" onchange="updateEquipment()"> Bar Service</label>
-            </div>
+        <div class="view-inner">
+          <div class="venue-grid">
+            <div class="venue-card" onclick="selectVenue('The Drawing Room')"><div class="venue-card-icon">🛋️</div><div class="venue-card-name">The Drawing Room</div><div class="venue-card-cap">Up to 30 guests</div></div>
+            <div class="venue-card" onclick="selectVenue('Sky Bar & Terrace')"><div class="venue-card-icon">🌅</div><div class="venue-card-name">Sky Bar & Terrace</div><div class="venue-card-cap">Up to 50 guests</div></div>
+            <div class="venue-card" onclick="selectVenue('The Theatre')"><div class="venue-card-icon">🎭</div><div class="venue-card-name">The Theatre</div><div class="venue-card-cap">Up to 80 guests</div></div>
+            <div class="venue-card" onclick="selectVenue('Private Dining Room')"><div class="venue-card-icon">🍽️</div><div class="venue-card-name">Private Dining Room</div><div class="venue-card-cap">Up to 20 guests</div></div>
+            <div class="venue-card" onclick="selectVenue('Lido Pool Deck')"><div class="venue-card-icon">🏊</div><div class="venue-card-name">Lido Pool Deck</div><div class="venue-card-cap">Up to 100 guests</div></div>
+            <div class="venue-card" onclick="selectVenue('Atrium')"><div class="venue-card-icon">✨</div><div class="venue-card-name">Atrium</div><div class="venue-card-cap">Up to 60 guests</div></div>
           </div>
-          <div class="form-group"><label class="form-label">Notes</label><textarea id="venNotes" class="form-textarea" placeholder="Event type, guests, requirements..."></textarea></div>
-          <div class="form-actions"><button class="btn-gold" onclick="submitVenueRequest()" id="venSubmitBtn">Send Request</button></div>
-          <div id="venConfirmation" class="venue-confirmation" style="display:none">Your request has been sent to hotel_director@vvodyssey.com. You will receive confirmation within 24 hours.</div>
-          <div id="venError" class="venue-error" style="display:none"></div>
+          <div class="section-header" style="margin-top:28px">
+            <div><div class="section-title">Reservation Request</div><div class="section-sub">Our hotel team will confirm within 24 hours</div></div>
+          </div>
+          <div class="admin-panel" style="background:var(--white)">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Your Name *</label><input id="venName" class="form-input" type="text" placeholder="Full name"></div>
+              <div class="form-group"><label class="form-label">Cabin *</label><input id="venCabin" class="form-input" type="text" placeholder="e.g. Deck 8, Cabin 14"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Venue *</label>
+              <select id="venVenue" class="form-select">
+                <option value="">Select a venue...</option>
+                <option>The Drawing Room</option><option>Sky Bar &amp; Terrace</option>
+                <option>The Theatre</option><option>Private Dining Room</option>
+                <option>Lido Pool Deck</option><option>Atrium</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Date *</label><input id="venDate" class="form-input" type="date"></div>
+              <div class="form-group"><label class="form-label">Time</label><input id="venTime" class="form-input" type="text" placeholder="e.g. 7:00 PM - 10:00 PM"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Equipment Needed</label>
+              <div class="equipment-grid">
+                <label class="equipment-item"><input type="checkbox" value="AV / Projector" onchange="updateEquipment()"> AV / Projector</label>
+                <label class="equipment-item"><input type="checkbox" value="Microphone" onchange="updateEquipment()"> Microphone</label>
+                <label class="equipment-item"><input type="checkbox" value="Sound System" onchange="updateEquipment()"> Sound System</label>
+                <label class="equipment-item"><input type="checkbox" value="Bar Service" onchange="updateEquipment()"> Bar Service</label>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Notes</label><textarea id="venNotes" class="form-textarea" placeholder="Event type, guests, requirements..."></textarea></div>
+            <div class="form-actions"><button class="btn-gold" onclick="submitVenueRequest()" id="venSubmitBtn">Send Request</button></div>
+            <div id="venConfirmation" class="venue-confirmation" style="display:none">Your request has been submitted and is pending approval. You will be notified once confirmed.</div>
+            <div id="venError" class="venue-error" style="display:none"></div>
+          </div>
         </div>
       </div>
-    </div>
 
+      <!-- CALENDAR VIEW -->
+      <div id="venue-calendar" class="sub-tab-content">
+        <div class="view-inner">
+          <div class="section-header">
+            <div><div class="section-title">Venue Availability</div><div class="section-sub">Confirmed bookings for the next 30 days</div></div>
+          </div>
+          <div class="vcal-nav">
+            <button class="cal-nav-btn" onclick="venCalPrev()">&#8249;</button>
+            <div class="cal-title" id="venCalMonth">Loading...</div>
+            <button class="cal-nav-btn" onclick="venCalNext()">&#8250;</button>
+          </div>
+          <div id="venCalGrid" class="vcal-grid"></div>
+          <div id="venCalLegend" class="vcal-legend">
+            <span class="vcal-dot vcal-dot-booked"></span> Booked
+            <span class="vcal-dot vcal-dot-free" style="margin-left:16px"></span> Available
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN REQUESTS -->
+      <div id="venue-requests" class="sub-tab-content admin-only">
+        <div class="view-inner">
+          <div class="section-header">
+            <div><div class="section-title">Venue Requests</div><div class="section-sub">Approve or decline reservation requests</div></div>
+          </div>
+          <div id="venueRequestsList"></div>
+        </div>
+      </div>
+
+    </div>
   </main>
 
   <!-- BOTTOM NAV — 4 tabs only -->

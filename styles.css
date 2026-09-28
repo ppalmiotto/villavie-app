@@ -1222,3 +1222,28 @@ main { flex: 1; overflow-y: auto; }
   width: auto;
   object-fit: contain;
 }
+
+/* ─── VENUE BOOKING CALENDAR ─── */
+.vcal-nav { display:flex; align-items:center; justify-content:space-between; padding:10px 16px 6px; }
+.vcal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
+.vcal-wd { text-align:center; font-size:10px; font-weight:500; color:var(--text-light); text-transform:uppercase; padding:4px 0; }
+.vcal-days { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.vcal-day { min-height:64px; padding:4px; border:1px solid var(--cream-dark); border-radius:6px; background:var(--white); }
+.vcal-day-empty { background:transparent; border:none; }
+.vcal-day.vcal-today { border-color:var(--navy); background:var(--info-bg); }
+.vcal-day.vcal-past { opacity:0.4; }
+.vcal-day-num { font-size:12px; font-weight:500; color:var(--navy); margin-bottom:2px; }
+.vcal-booking { font-size:9px; background:var(--navy); color:var(--white); border-radius:3px; padding:1px 4px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.vcal-legend { display:flex; align-items:center; padding:12px 0 4px; font-size:12px; color:var(--text-light); }
+.vcal-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.vcal-dot-booked { background:var(--navy); }
+.vcal-dot-free { background:var(--cream-dark); border:1px solid var(--cream-dark); }
+
+/* ─── VENUE REQUEST CARDS ─── */
+.venue-req-card { background:var(--white); border:1px solid var(--cream-dark); border-radius:14px; padding:16px; margin-bottom:12px; }
+.venue-req-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.venue-req-venue { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:500; color:var(--navy); }
+.venue-req-meta { font-size:12px; color:var(--text-light); margin-top:2px; }
+.venue-req-status { font-size:11px; font-weight:600; letter-spacing:0.5px; }
+.venue-req-detail { font-size:13px; color:var(--text-mid); padding:4px 0; }
+.venue-req-actions { display:flex; gap:10px; margin-top:12px; }

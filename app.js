@@ -895,41 +895,62 @@ function updateEquipment() {
   _venueEquipment = Array.from(document.querySelectorAll('.equipment-item input:checked')).map(function(cb) { return cb.value; });
 }
 async function submitVenueRequest() {
-  var name = document.getElementById('venName').value.trim();
-  var cabin = document.getElementById('venCabin').value.trim();
-  var venue = document.getElementById('venVenue').value;
-  var date = document.getElementById('venDate').value;
-  var errEl = document.getElementById('venError');
-  var confEl = document.getElementById('venConfirmation');
-  var btn = document.getElementById('venSubmitBtn');
+  var name    = document.getElementById('venName').value.trim();
+  var cabin   = document.getElementById('venCabin').value.trim();
+  var venue   = document.getElementById('venVenue').value;
+  var date    = document.getElementById('venDate').value;
+  var time    = document.getElementById('venTime') ? document.getElementById('venTime').value : '';
+  var notes   = document.getElementById('venNotes') ? document.getElementById('venNotes').value.trim() : '';
+  var errEl   = document.getElementById('venError');
+  var confEl  = document.getElementById('venConfirmation');
+  var btn     = document.getElementById('venSubmitBtn');
+
   if (!name || !cabin || !venue || !date) {
     if (errEl) { errEl.textContent = 'Please fill in all required fields.'; errEl.style.display = 'block'; }
     return;
   }
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
-  var equipment = _venueEquipment.length ? _venueEquipment.join(', ') : 'None';
-  var params = { to_email: 'hotel_director@vvodyssey.com', from_name: name, cabin: cabin, venue: venue,
-    date: new Date(date).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
-    time: document.getElementById('venTime').value || 'Not specified',
-    equipment: equipment, notes: document.getElementById('venNotes').value || 'None',
-    submitted_at: new Date().toLocaleString('en-GB') };
+
+  var equipment = _venueEquipment.length ? _venueEquipment.join(', ') : '';
+
   try {
-    if (!_emailJsReady) throw new Error('EmailJS not ready');
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    // Save to Supabase
+    if (sbClient) {
+      var { error } = await sbClient.from('venue_bookings').insert({
+        venue: venue, resident_name: name, cabin: cabin,
+        date: date, time_slot: time, equipment: equipment,
+        notes: notes, status: 'pending'
+      });
+      if (error) throw error;
+    }
+
+    // Also send email notification
+    if (_emailJsReady) {
+      var params = {
+        to_email: 'hotel_director@vvodyssey.com', from_name: name, cabin: cabin,
+        venue: venue, date: new Date(date).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+        time: time || 'Not specified', equipment: equipment || 'None', notes: notes || 'None',
+        submitted_at: new Date().toLocaleString('en-GB')
+      };
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    }
+
     if (confEl) confEl.style.display = 'block';
-    if (btn) btn.textContent = 'Request Sent';
-    showToast('Venue request sent');
+    if (btn) btn.textContent = 'Request Sent ✓';
+    showToast('Venue request submitted ✓');
     ['venName','venCabin','venTime','venNotes'].forEach(function(id) { var e = document.getElementById(id); if (e) e.value = ''; });
     document.getElementById('venVenue').value = '';
     document.getElementById('venDate').value = '';
     document.querySelectorAll('.equipment-item input').forEach(function(cb) { cb.checked = false; });
     _venueEquipment = [];
   } catch(err) {
-    if (confEl) { confEl.textContent = 'Request noted. Please also contact the hotel team at extension 100.'; confEl.style.display = 'block'; }
+    console.error('Venue submit error:', err);
+    if (confEl) { confEl.textContent = 'Request received. Please also contact the hotel team at extension 100.'; confEl.style.display = 'block'; }
     if (btn) { btn.textContent = 'Send Request'; btn.disabled = false; }
   }
 }
+// SKIP OLD FUNCTION
 window.selectVenue = selectVenue;
 window.updateEquipment = updateEquipment;
 window.submitVenueRequest = submitVenueRequest;
@@ -1121,3 +1142,175 @@ function renderEmergencyMessages() {
 // ═══════════════════════════════════════════════
 
 window.renderEmergencyMessages = renderEmergencyMessages;
+
+// ══════════════════════════════════════════════
+//  VENUE BOOKING CALENDAR
+// ══════════════════════════════════════════════
+
+var venCalYear  = new Date().getFullYear();
+var venCalMonth = new Date().getMonth();
+var venBookings = [];
+
+function venCalPrev() {
+  venCalMonth--;
+  if (venCalMonth < 0) { venCalMonth = 11; venCalYear--; }
+  renderVenueCalendar();
+}
+function venCalNext() {
+  venCalMonth++;
+  if (venCalMonth > 11) { venCalMonth = 0; venCalYear++; }
+  renderVenueCalendar();
+}
+window.venCalPrev = venCalPrev;
+window.venCalNext = venCalNext;
+
+async function loadVenueCalendar() {
+  if (!sbClient) return;
+  try {
+    var { data, error } = await sbClient
+      .from('venue_bookings')
+      .select('venue, date, time_slot, status')
+      .eq('status', 'approved')
+      .order('date');
+    if (!error && data) {
+      venBookings = data;
+      renderVenueCalendar();
+    }
+  } catch(e) { console.error('loadVenueCalendar:', e); }
+}
+
+function renderVenueCalendar() {
+  var el = document.getElementById('venCalGrid');
+  var titleEl = document.getElementById('venCalMonth');
+  if (!el) return;
+
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if (titleEl) titleEl.textContent = monthNames[venCalMonth] + ' ' + venCalYear;
+
+  // Get bookings for this month
+  var monthStr = venCalYear + '-' + String(venCalMonth+1).padStart(2,'0');
+  var monthBookings = venBookings.filter(function(b) {
+    return b.date && b.date.startsWith(monthStr);
+  });
+
+  // Build calendar grid
+  var firstDay = new Date(venCalYear, venCalMonth, 1).getDay();
+  var daysInMonth = new Date(venCalYear, venCalMonth+1, 0).getDate();
+  var today = new Date().toISOString().slice(0,10);
+
+  var html = '<div class="vcal-weekdays">';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(d) {
+    html += '<div class="vcal-wd">' + d + '</div>';
+  });
+  html += '</div><div class="vcal-days">';
+
+  // Empty cells before first day
+  for (var i = 0; i < firstDay; i++) {
+    html += '<div class="vcal-day vcal-day-empty"></div>';
+  }
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = venCalYear + '-' + String(venCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var dayBookings = monthBookings.filter(function(b) { return b.date === dateStr; });
+    var isToday = dateStr === today;
+    var isPast = dateStr < today;
+
+    html += '<div class="vcal-day' + (isToday ? ' vcal-today' : '') + (isPast ? ' vcal-past' : '') + '">';
+    html += '<div class="vcal-day-num">' + d + '</div>';
+
+    if (dayBookings.length > 0) {
+      dayBookings.forEach(function(b) {
+        html += '<div class="vcal-booking" title="' + b.venue + (b.time_slot ? ' · ' + b.time_slot : '') + '">' +
+          b.venue.split(' ')[0] + (b.venue.split(' ')[1] ? ' ' + b.venue.split(' ')[1] : '') +
+          '</div>';
+      });
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ── ADMIN: LOAD AND MANAGE REQUESTS ──────────
+async function loadVenueRequests() {
+  if (!sbClient || !isAdmin) return;
+  var el = document.getElementById('venueRequestsList');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light)">Loading...</div>';
+
+  try {
+    var { data, error } = await sbClient
+      .from('venue_bookings')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    if (!data || !data.length) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">No requests yet.</div>';
+      return;
+    }
+
+    var pending = data.filter(function(b) { return b.status === 'pending'; });
+    var others  = data.filter(function(b) { return b.status !== 'pending'; });
+
+    var html = '';
+    if (pending.length) {
+      html += '<div class="section-title" style="padding:16px 0 8px">Pending (' + pending.length + ')</div>';
+      pending.forEach(function(b) { html += venueRequestCard(b); });
+    }
+    if (others.length) {
+      html += '<div class="section-title" style="padding:16px 0 8px;margin-top:8px">Previous</div>';
+      others.forEach(function(b) { html += venueRequestCard(b); });
+    }
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--danger);padding:20px">Error loading requests.</div>';
+  }
+}
+
+function venueRequestCard(b) {
+  var date = new Date(b.date).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  var statusColor = b.status === 'approved' ? 'var(--success)' : b.status === 'declined' ? 'var(--danger)' : 'var(--gold)';
+  return '<div class="venue-req-card">' +
+    '<div class="venue-req-header">' +
+      '<div>' +
+        '<div class="venue-req-venue">' + b.venue + '</div>' +
+        '<div class="venue-req-meta">' + b.resident_name + (b.cabin ? ' · ' + b.cabin : '') + '</div>' +
+      '</div>' +
+      '<span class="venue-req-status" style="color:' + statusColor + '">' + b.status.toUpperCase() + '</span>' +
+    '</div>' +
+    '<div class="venue-req-detail">📅 ' + date + (b.time_slot ? ' · ' + b.time_slot : '') + '</div>' +
+    (b.equipment ? '<div class="venue-req-detail">🔧 ' + b.equipment + '</div>' : '') +
+    (b.notes ? '<div class="venue-req-detail">📝 ' + b.notes + '</div>' : '') +
+    (b.status === 'pending' ?
+      '<div class="venue-req-actions">' +
+        '<button class="btn-gold btn-sm" onclick="approveVenue(\"' + b.id + '\")">✓ Approve</button>' +
+        '<button class="btn-outline btn-sm" onclick="declineVenue(\"' + b.id + '\")">✕ Decline</button>' +
+      '</div>' : '') +
+    '</div>';
+}
+
+async function approveVenue(id) {
+  await updateVenueStatus(id, 'approved');
+}
+async function declineVenue(id) {
+  await updateVenueStatus(id, 'declined');
+}
+async function updateVenueStatus(id, status) {
+  try {
+    var { error } = await sbClient
+      .from('venue_bookings')
+      .update({ status: status, updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (!error) {
+      showToast('Booking ' + status);
+      loadVenueRequests();
+    }
+  } catch(e) { showToast('Error updating booking'); }
+}
+
+window.loadVenueCalendar = loadVenueCalendar;
+window.loadVenueRequests = loadVenueRequests;
+window.approveVenue = approveVenue;
+window.declineVenue = declineVenue;
+window.renderVenueCalendar = renderVenueCalendar;

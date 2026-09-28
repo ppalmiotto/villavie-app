@@ -185,6 +185,39 @@ window.residentLogout = residentLogout;
 window.requestPasswordReset = requestPasswordReset;
 window.submitNewPassword = submitNewPassword;
 window.showLoginScreen = showLoginScreen;
+
+// ── ACCESS LEVEL ─────────────────────────────
+// Levels: team, founder, resident, renter
+function applyAccessLevel(level) {
+  var isRenter = level === 'renter';
+  
+  // Hide Updates and Chat tabs for renters
+  document.querySelectorAll('.nav-tab, .bnav-btn').forEach(function(btn) {
+    var onclick = btn.getAttribute('onclick') || '';
+    if (onclick.includes("'updates'") || onclick.includes("'chat'")) {
+      btn.style.display = isRenter ? 'none' : '';
+    }
+  });
+  
+  // Show access level badge
+  var badge = document.getElementById('adminBadge');
+  if (badge) {
+    if (level === 'team') {
+      badge.textContent = 'Team';
+      badge.style.display = 'inline-block';
+    } else if (level === 'founder') {
+      badge.textContent = 'Founder';
+      badge.style.display = 'inline-block';
+      badge.style.background = 'var(--gold)';
+      badge.style.color = 'var(--navy)';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+window.applyAccessLevel = applyAccessLevel;
+window.accessLevel = 'resident'; // default
+
 window.onAuthSuccess = onAuthSuccess;
 window.showPasswordResetForm = showPasswordResetForm;
 window.hidePasswordResetForm = hidePasswordResetForm;
