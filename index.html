@@ -695,15 +695,10 @@
           <div class="venues-sub">Reserve a private space aboard the Odyssey</div>
         </div>
         <div class="view-inner">
-          <div class="venue-grid">
-            <div class="venue-card" onclick="selectVenue('The Drawing Room')"><div class="venue-card-icon">🛋️</div><div class="venue-card-name">The Drawing Room</div><div class="venue-card-cap">Up to 30 guests</div></div>
-            <div class="venue-card" onclick="selectVenue('Sky Bar & Terrace')"><div class="venue-card-icon">🌅</div><div class="venue-card-name">Sky Bar & Terrace</div><div class="venue-card-cap">Up to 50 guests</div></div>
-            <div class="venue-card" onclick="selectVenue('The Theatre')"><div class="venue-card-icon">🎭</div><div class="venue-card-name">The Theatre</div><div class="venue-card-cap">Up to 80 guests</div></div>
-            <div class="venue-card" onclick="selectVenue('Private Dining Room')"><div class="venue-card-icon">🍽️</div><div class="venue-card-name">Private Dining Room</div><div class="venue-card-cap">Up to 20 guests</div></div>
-            <div class="venue-card" onclick="selectVenue('Lido Pool Deck')"><div class="venue-card-icon">🏊</div><div class="venue-card-name">Lido Pool Deck</div><div class="venue-card-cap">Up to 100 guests</div></div>
-            <div class="venue-card" onclick="selectVenue('Atrium')"><div class="venue-card-icon">✨</div><div class="venue-card-name">Atrium</div><div class="venue-card-cap">Up to 60 guests</div></div>
+          <div class="venue-grid" style="grid-template-columns:1fr;max-width:300px;margin:0 auto 8px;">
+            <div class="venue-card" onclick="selectVenue('Venue')"><div class="venue-card-icon">🏛️</div><div class="venue-card-name">Venue</div><div class="venue-card-cap">Contact us for capacity details</div></div>
           </div>
-          <div class="section-header" style="margin-top:28px">
+          <div class="section-header"<div class="section-header" style="margin-top:28px">
             <div><div class="section-title">Reservation Request</div><div class="section-sub">Our hotel team will confirm within 24 hours</div></div>
           </div>
           <div class="admin-panel" style="background:var(--white)">
@@ -714,9 +709,7 @@
             <div class="form-group"><label class="form-label">Venue *</label>
               <select id="venVenue" class="form-select">
                 <option value="">Select a venue...</option>
-                <option>The Drawing Room</option><option>Sky Bar &amp; Terrace</option>
-                <option>The Theatre</option><option>Private Dining Room</option>
-                <option>Lido Pool Deck</option><option>Atrium</option><option>Other</option>
+                <option>Venue</option>
               </select>
             </div>
             <div class="form-row">
