@@ -818,6 +818,90 @@
     });
   }
 </script>
+
+<script>
+// SPA CART — inline to ensure it loads regardless of app.js cache
+var spaCartItems = [];
+
+function handleSpaAdd(btn) {
+  var name = btn.getAttribute('data-name');
+  var duration = btn.getAttribute('data-duration');
+  var price = btn.getAttribute('data-price');
+  addToSpaCart(name, duration, price);
+}
+
+function addToSpaCart(name, duration, price) {
+  if (spaCartItems.find(function(i) { return i.name === name; })) {
+    if (typeof showToast === 'function') showToast(name + ' already in your selection');
+    return;
+  }
+  spaCartItems.push({ name: name, duration: duration, price: price });
+  updateSpaCartUI();
+  if (typeof showToast === 'function') showToast(name + ' added ✓');
+}
+
+function removeFromSpaCart(name) {
+  spaCartItems = spaCartItems.filter(function(i) { return i.name !== name; });
+  updateSpaCartUI();
+  renderSpaCartItems();
+  updateApptTreatmentList();
+}
+
+function updateSpaCartUI() {
+  var cartBtn = document.getElementById('spaCart');
+  var countEl = document.getElementById('spaCartCount');
+  if (cartBtn) cartBtn.style.display = spaCartItems.length ? 'flex' : 'none';
+  if (countEl) countEl.textContent = spaCartItems.length;
+  updateApptTreatmentList();
+  document.querySelectorAll('.spa-add-btn').forEach(function(btn) {
+    var n = btn.getAttribute('data-name');
+    var inCart = spaCartItems.find(function(i) { return i.name === n; });
+    btn.textContent = inCart ? '✓ Added' : '+ Add';
+    btn.classList.toggle('btn-added', !!inCart);
+  });
+}
+
+function updateApptTreatmentList() {
+  var el = document.getElementById('apptTreatmentList');
+  if (!el) return;
+  if (!spaCartItems.length) { el.innerHTML = ''; return; }
+  el.innerHTML = spaCartItems.map(function(item) {
+    return '<div class="spa-selected-item"><span>' + item.name + (item.duration ? ' · ' + item.duration : '') + '</span>' +
+      '<button class="spa-remove-btn" onclick="removeFromSpaCart(this.getAttribute('data-name'))" data-name="' + item.name.replace(/"/g, '&quot;') + '">✕</button></div>';
+  }).join('');
+}
+
+function openSpaCart() {
+  var panel = document.getElementById('spaCartPanel');
+  if (panel) { panel.style.display = 'block'; renderSpaCartItems(); panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+function closeSpaCart() {
+  var panel = document.getElementById('spaCartPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function renderSpaCartItems() {
+  var el = document.getElementById('spaCartItems');
+  if (!el) return;
+  if (!spaCartItems.length) {
+    el.innerHTML = '<div style="color:var(--text-light);font-size:14px;padding:8px 0">No treatments selected yet.</div>';
+    return;
+  }
+  el.innerHTML = spaCartItems.map(function(item) {
+    return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + item.name + '</div>' +
+      '<div class="spa-cart-item-detail">' + (item.duration || '') + (item.price ? ' · ' + item.price : '') + '</div></div>' +
+      '<button class="spa-remove-btn" onclick="removeFromSpaCart(this.getAttribute('data-name'))" data-name="' + item.name.replace(/"/g, '&quot;') + '">✕</button></div>';
+  }).join('');
+}
+
+function proceedToBook() {
+  closeSpaCart();
+  var s = document.getElementById('spaApptSection');
+  if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+
 </body>
 </html>
     
