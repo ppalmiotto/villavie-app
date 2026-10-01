@@ -1305,3 +1305,33 @@ main { flex: 1; overflow-y: auto; }
   flex-wrap: wrap;
 }
 .spa-treatment-body { flex: 1; min-width: 0; }
+
+/* ─── COMMUNITY GROUPS ─── */
+.groups-list { padding: 8px 0 40px; }
+.groups-empty { text-align: center; padding: 60px 20px; color: var(--text-light); }
+
+.group-card {
+  background: var(--white); border: 1px solid var(--cream-dark);
+  border-radius: 16px; padding: 18px 20px; margin-bottom: 12px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  transition: box-shadow 0.2s;
+}
+.group-card:hover { box-shadow: 0 4px 16px rgba(30,61,42,0.08); }
+.group-card-body { flex: 1; min-width: 0; }
+.group-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.group-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: var(--navy); }
+.group-level-badge {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
+  background: var(--navy); color: var(--gold-light);
+  padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+}
+.group-desc { font-size: 13px; color: var(--text-mid); line-height: 1.5; margin-bottom: 8px; }
+.group-meta { display: flex; gap: 14px; font-size: 12px; color: var(--text-light); flex-wrap: wrap; }
+.group-member-count { display: flex; align-items: center; gap: 4px; }
+.group-card-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+.group-joined-btn { background: var(--success-bg) !important; border-color: var(--success) !important; color: var(--success) !important; }
+.group-delete-btn {
+  background: none; border: none; color: var(--text-light);
+  cursor: pointer; font-size: 16px; padding: 4px; line-height: 1;
+}
+.group-delete-btn:hover { color: var(--danger); }

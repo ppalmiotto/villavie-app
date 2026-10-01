@@ -1,98 +1,4 @@
 // ══════════════════════════════════════════════
-//  V
-// ══════════════════════════════════════════════
-//  SPA CART
-// ══════════════════════════════════════════════
-
-var spaCartItems = [];
-
-function handleSpaAdd(btn) {
-  var name = btn.getAttribute('data-name');
-  var duration = btn.getAttribute('data-duration');
-  var price = btn.getAttribute('data-price');
-  addToSpaCart(name, duration, price);
-}
-
-function addToSpaCart(name, duration, price) {
-  if (spaCartItems.find(function(i) { return i.name === name; })) {
-    showToast(name + ' already in your selection');
-    return;
-  }
-  spaCartItems.push({ name: name, duration: duration, price: price });
-  updateSpaCartUI();
-  showToast(name + ' added ✓');
-}
-
-function removeFromSpaCart(name) {
-  spaCartItems = spaCartItems.filter(function(i) { return i.name !== name; });
-  updateSpaCartUI();
-  renderSpaCartItems();
-  updateApptTreatmentList();
-}
-
-function updateSpaCartUI() {
-  var cartBtn = document.getElementById('spaCart');
-  var countEl = document.getElementById('spaCartCount');
-  if (cartBtn) cartBtn.style.display = spaCartItems.length ? 'flex' : 'none';
-  if (countEl) countEl.textContent = spaCartItems.length;
-  updateApptTreatmentList();
-  document.querySelectorAll('.spa-add-btn').forEach(function(btn) {
-    var name = btn.getAttribute('data-name');
-    var inCart = spaCartItems.find(function(i) { return i.name === name; });
-    btn.textContent = inCart ? '✓ Added' : '+ Add';
-    btn.classList.toggle('btn-added', !!inCart);
-  });
-}
-
-function updateApptTreatmentList() {
-  var el = document.getElementById('apptTreatmentList');
-  if (!el) return;
-  if (!spaCartItems.length) { el.innerHTML = ''; return; }
-  el.innerHTML = spaCartItems.map(function(item) {
-    return '<div class="spa-selected-item"><span>' + item.name + (item.duration ? ' · ' + item.duration : '') + '</span>' +
-      '<button class="spa-remove-btn" onclick="removeFromSpaCart(\"' + item.name + '\")">✕</button></div>';
-  }).join('');
-}
-
-function openSpaCart() {
-  var panel = document.getElementById('spaCartPanel');
-  if (panel) { panel.style.display = 'block'; renderSpaCartItems(); panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-}
-
-function closeSpaCart() {
-  var panel = document.getElementById('spaCartPanel');
-  if (panel) panel.style.display = 'none';
-}
-
-function renderSpaCartItems() {
-  var el = document.getElementById('spaCartItems');
-  if (!el) return;
-  if (!spaCartItems.length) {
-    el.innerHTML = '<div style="color:var(--text-light);font-size:14px;padding:8px 0">No treatments selected yet.</div>';
-    return;
-  }
-  el.innerHTML = spaCartItems.map(function(item) {
-    return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + item.name + '</div>' +
-      '<div class="spa-cart-item-detail">' + (item.duration || '') + (item.price ? ' · ' + item.price : '') + '</div></div>' +
-      '<button class="spa-remove-btn" onclick="removeFromSpaCart(\"' + item.name + '\")">✕</button></div>';
-  }).join('');
-}
-
-function proceedToBook() {
-  closeSpaCart();
-  var apptSection = document.getElementById('spaApptSection');
-  if (apptSection) apptSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-window.handleSpaAdd = handleSpaAdd;
-window.addToSpaCart = addToSpaCart;
-window.removeFromSpaCart = removeFromSpaCart;
-window.updateSpaCartUI = updateSpaCartUI;
-window.openSpaCart = openSpaCart;
-window.closeSpaCart = closeSpaCart;
-window.proceedToBook = proceedToBook;
-
-// ══════════════════════════════════════════════
 //  VILLA VIE RESIDENCES — app.js
 // ══════════════════════════════════════════════
 
@@ -302,7 +208,7 @@ function submitApptRequest() {
   const treatment = document.getElementById('apptTreatment').value;
   const date = document.getElementById('apptDate').value;
   const time = document.getElementById('apptTime').value;
-  if (!name || !date || !spaCartItems.length) { showToast('Please fill in your name, date and select at least one treatment'); return; }
+  if (!name || !treatment || !date) { showToast('Please fill in your name, treatment and date'); return; }
   // Show confirmation
   document.getElementById('apptConfirmation').style.display = 'block';
   // Clear form
@@ -655,7 +561,7 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-
+window.addEventListener('DOMContentLoaded', init);
 
 // ══════════════════════════════════════════════
 //  POLLS
@@ -668,6 +574,7 @@ function switchTab(id, tab) {
   document.getElementById('view-' + id).classList.add('active');
   if (tab) tab.classList.add('active');
   if (id === 'updates') document.getElementById('updatesBadge').classList.remove('show');
+  if (id === 'groups') { if (typeof loadGroups === 'function') loadGroups(); }
   if (id === 'chat') {
     document.getElementById('chatBadge')?.classList.remove('show');
     if (typeof onChatTabOpen === 'function') onChatTabOpen();
@@ -675,7 +582,7 @@ function switchTab(id, tab) {
 }
 
 function syncTopNav(id) {
-  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'rent', 'chat'];
+  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'groups', 'chat'];
   document.querySelectorAll('.nav-tab').forEach((t, i) => t.classList.toggle('active', tabMap[i] === id));
 }
 
@@ -944,7 +851,7 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-
+window.addEventListener('DOMContentLoaded', init);
 
 // SUB-TAB SWITCHER
 function switchSubTab(contentId, btnId) {
@@ -1403,3 +1310,163 @@ window.loadVenueRequests = loadVenueRequests;
 window.approveVenue = approveVenue;
 window.declineVenue = declineVenue;
 window.renderVenueCalendar = renderVenueCalendar;
+
+// ══════════════════════════════════════════════
+//  COMMUNITY GROUPS
+// ══════════════════════════════════════════════
+
+var accessLevelOrder = { 'renter': 0, 'resident': 1, 'founder': 2, 'team': 3 };
+var groupsData = [];
+var groupMemberships = [];
+
+async function loadGroups() {
+  if (!sbClient) return;
+  var userLevel = window.accessLevel || 'resident';
+  var userRank = accessLevelOrder[userLevel] || 0;
+
+  try {
+    var { data: groups, error } = await sbClient
+      .from('groups')
+      .select('*, group_members(user_email)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    groupsData = groups || [];
+
+    // Get current user memberships
+    var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+    var { data: memberships } = await sbClient
+      .from('group_members')
+      .select('group_id')
+      .eq('user_email', userEmail);
+    groupMemberships = (memberships || []).map(function(m) { return m.group_id; });
+
+    renderGroups(userRank, userEmail);
+  } catch(e) {
+    console.error('loadGroups error:', e);
+    var el = document.getElementById('groupsList');
+    if (el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">Could not load groups.</div>';
+  }
+}
+
+function renderGroups(userRank, userEmail) {
+  var el = document.getElementById('groupsList');
+  var subtitle = document.getElementById('groupsSubtitle');
+  if (!el) return;
+
+  // Filter groups by access level
+  var visible = groupsData.filter(function(g) {
+    var groupRank = accessLevelOrder[g.min_access_level] || 0;
+    return userRank >= groupRank;
+  });
+
+  if (subtitle) subtitle.textContent = visible.length + ' group' + (visible.length !== 1 ? 's' : '') + ' available to you';
+
+  if (!visible.length) {
+    el.innerHTML = '<div class="groups-empty"><div style="font-size:40px;margin-bottom:12px">&#128101;</div><div style="font-size:16px;font-weight:500;color:var(--navy)">No groups yet</div><div style="font-size:13px;color:var(--text-light);margin-top:6px">Be the first to create a community group</div></div>';
+    return;
+  }
+
+  var levelLabels = { renter: 'Everyone', resident: 'Residents & Founders', founder: 'Founders only', team: 'Team only' };
+
+  el.innerHTML = visible.map(function(g) {
+    var memberCount = (g.group_members || []).length;
+    var isMember = groupMemberships.indexOf(g.group_id || g.id) > -1 || 
+                   (g.group_members || []).some(function(m) { return m.user_email === userEmail; });
+    var isOwner = g.created_by === userEmail;
+    var isAdmin = typeof window.isAdmin !== 'undefined' && window.isAdmin;
+    var levelLabel = levelLabels[g.min_access_level] || g.min_access_level;
+
+    return '<div class="group-card">' +
+      '<div class="group-card-body">' +
+        '<div class="group-card-header">' +
+          '<div class="group-name">' + escapeHtml(g.name) + '</div>' +
+          (g.min_access_level !== 'renter' ?
+            '<span class="group-level-badge">' + levelLabel + '</span>' : '') +
+        '</div>' +
+        '<div class="group-desc">' + escapeHtml(g.description || '') + '</div>' +
+        '<div class="group-meta">' +
+          '<span class="group-member-count">&#128101; ' + memberCount + ' member' + (memberCount !== 1 ? 's' : '') + '</span>' +
+          '<span class="group-creator">Created by ' + escapeHtml(g.created_by_name || g.created_by || 'resident') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="group-card-actions">' +
+        (isMember ?
+          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\"' + g.id + '\")">&#10003; Joined</button>' :
+          '<button class="btn-gold btn-sm" onclick="joinGroup(\"' + g.id + '\")">Join</button>') +
+        ((isOwner || isAdmin) ?
+          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\"' + g.id + '\")">&#128465;</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function createGroup() {
+  var name = document.getElementById('groupName').value.trim();
+  var desc = document.getElementById('groupDesc').value.trim();
+  var level = document.getElementById('groupLevel').value;
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
+    currentUser.user_metadata.full_name || userEmail : userEmail;
+
+  if (!name || !desc) { showToast('Please fill in name and description'); return; }
+  if (!sbClient) { showToast('Not connected'); return; }
+
+  try {
+    var { error } = await sbClient.from('groups').insert({
+      name: name, description: desc,
+      min_access_level: level,
+      created_by: userEmail,
+      created_by_name: userName
+    });
+    if (error) throw error;
+    hideForm('createGroupForm');
+    document.getElementById('groupName').value = '';
+    document.getElementById('groupDesc').value = '';
+    showToast('Group created ✓');
+    loadGroups();
+  } catch(e) {
+    console.error('createGroup error:', e);
+    showToast('Error creating group');
+  }
+}
+
+async function joinGroup(groupId) {
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
+    currentUser.user_metadata.full_name || userEmail : userEmail;
+  if (!userEmail) { showToast('Please log in to join groups'); return; }
+  try {
+    var { error } = await sbClient.from('group_members').insert({
+      group_id: groupId, user_email: userEmail, user_name: userName
+    });
+    if (error && error.code !== '23505') throw error;
+    showToast('Joined group ✓');
+    loadGroups();
+  } catch(e) { showToast('Error joining group'); }
+}
+
+async function leaveGroup(groupId) {
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  try {
+    await sbClient.from('group_members').delete()
+      .eq('group_id', groupId).eq('user_email', userEmail);
+    showToast('Left group');
+    loadGroups();
+  } catch(e) { showToast('Error leaving group'); }
+}
+
+async function deleteGroup(groupId) {
+  if (!confirm('Delete this group? This cannot be undone.')) return;
+  try {
+    await sbClient.from('groups').delete().eq('id', groupId);
+    showToast('Group deleted');
+    loadGroups();
+  } catch(e) { showToast('Error deleting group'); }
+}
+
+window.loadGroups = loadGroups;
+window.createGroup = createGroup;
+window.joinGroup = joinGroup;
+window.leaveGroup = leaveGroup;
+window.deleteGroup = deleteGroup;

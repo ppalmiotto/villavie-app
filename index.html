@@ -165,7 +165,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       Venues
     </button>
-    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('rent',this)">
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('groups',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       Rent Villa Vie
     </button>
@@ -599,27 +599,49 @@
       </div>
     </div>
     <!-- ── RENT VILLA VIE ── -->
-    <div class="view" id="view-rent" role="tabpanel">
-      <div class="rent-hero">
-        <div class="rent-icon">🏠</div>
-        <div class="rent-title">Rent Villa Vie</div>
-        <div class="rent-sub">Share the experience with friends &amp; family</div>
+    <div class="view" id="view-groups" role="tabpanel">
+      <div class="venues-hero">
+        <div class="venues-icon">&#128101;</div>
+        <div class="venues-title">Community Groups</div>
+        <div class="venues-sub">Connect with fellow residents around shared interests</div>
       </div>
       <div class="view-inner">
-        <div class="rent-card">
-          <div class="rent-card-body">
-            <div class="rent-card-title">Want to rent your villa?</div>
-            <div class="rent-card-desc">List your Villa Vie residence and share the experience with friends, family or guests while you travel the world.</div>
-            <a href="https://villavieresidences.com/rentvillavie" target="_blank" rel="noopener noreferrer" class="btn-rent">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              Find Out More
-            </a>
+        <div class="section-header">
+          <div>
+            <div class="section-title">Groups</div>
+            <div class="section-sub" id="groupsSubtitle">Browse and join community groups</div>
           </div>
+          <button class="btn-gold btn-sm" onclick="toggleForm('createGroupForm')">+ Create Group</button>
+        </div>
+        <div id="createGroupForm" class="admin-panel" style="display:none">
+          <div class="admin-panel-title">Create a Group</div>
+          <div class="form-group">
+            <label class="form-label">Group Name *</label>
+            <input id="groupName" class="form-input" type="text" placeholder="e.g. Book Club, Yoga Enthusiasts">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description *</label>
+            <textarea id="groupDesc" class="form-textarea" placeholder="What is this group about?"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Minimum Access Level</label>
+            <select id="groupLevel" class="form-select">
+              <option value="renter">Everyone</option>
+              <option value="resident">Residents &amp; Founders only</option>
+              <option value="founder">Founders only</option>
+              <option value="team">Team only</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn-gold" onclick="createGroup()">Create Group</button>
+            <button class="btn-outline" onclick="hideForm('createGroupForm')">Cancel</button>
+          </div>
+        </div>
+        <div id="groupsList" class="groups-list">
+          <div style="text-align:center;padding:40px;color:var(--text-light)">Loading groups...</div>
         </div>
       </div>
     </div>
-
-
     <!-- ── CHAT ── -->
     <div class="view" id="view-chat" role="tabpanel">
       <div class="chat-header-bar">
@@ -767,7 +789,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       <span>Venues</span>
     </button>
-    <button class="bnav-btn" onclick="switchTab('rent',this);syncTopNav('rent')">
+    <button class="bnav-btn" onclick="switchTab('groups',this);syncTopNav('groups')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       <span>Rent</span>
     </button>
