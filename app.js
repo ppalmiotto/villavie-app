@@ -136,7 +136,7 @@ const scheduleData = {
     { time: '10:00 AM', title: 'Library Open for Games', location: 'Library, Deck 5 Mid', category: 'activity' },
   ],
   1: [
-    { time: '07:00 AM', title: 'Tai Chi on Deck', location: 'Sun Deck, Level 11', category: 'wellness' },
+    { time: '07:00 AM', title: 'Tai Chi on Deck', location: 'Sun Deck, Deck 8', category: 'wellness' },
     { time: '07:30 AM', title: 'Breakfast Service Opens', location: 'The Grand Dining Room', category: 'dining' },
     { time: '09:30 AM', title: 'Cooking Demonstration', location: 'Culinary Studio', category: 'activity' },
     { time: '11:00 AM', title: 'Trivia Morning', location: 'The Drawing Room', category: 'entertainment' },
@@ -150,7 +150,7 @@ const scheduleData = {
     { time: '07:00 AM', title: 'Breakfast Service Opens', location: 'The Grand Dining Room', category: 'dining' },
     { time: '01:30 PM', title: 'Light Lunch — Open Seating', location: 'Lido Restaurant', category: 'dining' },
     { time: '07:30 PM', title: 'Gala Dinner', location: 'The Grand Dining Room', category: 'dining' },
-    { time: '10:00 PM', title: 'DJ Set', location: 'Sky Bar, Level 12', category: 'entertainment' },
+    { time: '10:00 PM', title: 'DJ Set', location: 'Coral Club, Deck 5', category: 'entertainment' },
   ],
   3: [
     { time: '07:30 AM', title: 'Breakfast Service Opens', location: 'The Grand Dining Room', category: 'dining' },
@@ -313,9 +313,9 @@ function submitApptRequest() {
 // ── SAFETY DATA ───────────────────────────────
 const safetyData = [
   { icon: '🆘', title: 'Muster Stations & Life Jackets', open: true,
-    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 4–6: Muster Station A — Atrium, Level 4</li><li>Decks 7–9: Muster Station B — Grand Dining Room</li><li>Decks 10–12: Muster Station C — Sky Bar, Level 12</li></ul>` },
+    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 2–4: Muster Station A — Main Lounge, Deck 4</li><li>Decks 5–6: Muster Station B — Neptune Lounge, Deck 5</li><li>Decks 7–8: Muster Station C — Pool Deck, Deck 8</li></ul>` },
   { icon: '🔥', title: 'Fire Safety', open: false,
-    content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 11 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
+    content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 8 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
   { icon: '🏥', title: 'Medical Centre', open: false,
     content: `<p>The Medical Centre is on Deck 3 forward, staffed 24 hours.</p><ul><li>Emergency: extension 911</li><li>Non-emergency: extension 302</li><li>Walk-in hours: 8:00–10:00 AM and 5:00–7:00 PM</li></ul>` },
   { icon: '🌊', title: 'Man Overboard Procedure', open: false,
