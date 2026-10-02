@@ -700,14 +700,46 @@
       <div id="venue-booking" class="sub-tab-content active">
         <div class="venues-hero">
           <div class="venues-icon">🏛️</div>
-          <div class="venues-title">Venue Reservations</div>
-          <div class="venues-sub">Reserve a private space aboard the Odyssey</div>
+          <div class="venues-title">Venues &amp; Spaces</div>
+          <div class="venues-sub">Aboard the Villa Vie Odyssey</div>
         </div>
         <div class="view-inner">
-          <div class="venue-grid" style="grid-template-columns:1fr;max-width:300px;margin:0 auto 8px;">
-            <div class="venue-card" onclick="selectVenue('Venue')"><div class="venue-card-icon">🏛️</div><div class="venue-card-name">Venue</div><div class="venue-card-cap">Contact us for capacity details</div></div>
+
+          <div class="venue-section-label">🍽️ Dining</div>
+          <div class="venue-grid">
+            <div class="venue-card" onclick="selectVenue('Thistle Restaurant')"><div class="venue-card-icon">🌿</div><div class="venue-card-name">Thistle Restaurant</div><div class="venue-card-cap">14-day rotating menu · Local &amp; plant-based</div></div>
+            <div class="venue-card" onclick="selectVenue('Palms Café')"><div class="venue-card-icon">🌴</div><div class="venue-card-name">Palms Café</div><div class="venue-card-cap">Buffet dining · American grill · Complimentary drinks</div></div>
           </div>
-          <div class="section-header"<div class="section-header" style="margin-top:28px">
+
+          <div class="venue-section-label">🍹 Bars &amp; Lounges</div>
+          <div class="venue-grid">
+            <div class="venue-card" onclick="selectVenue('Morning Light Pub')"><div class="venue-card-icon">☕</div><div class="venue-card-name">Morning Light Pub</div><div class="venue-card-cap">Deck 5 Mid · Café by day · Bar by evening</div></div>
+            <div class="venue-card" onclick="selectVenue(&quot;Mike's Bar&quot;)"><div class="venue-card-icon">🍺</div><div class="venue-card-name">Mike's Bar</div><div class="venue-card-cap">Pool bar · Cocktails · Big-screen sports</div></div>
+            <div class="venue-card" onclick="selectVenue('The Observatory')"><div class="venue-card-icon">🔭</div><div class="venue-card-name">The Observatory</div><div class="venue-card-cap">Deck 8 Fwd · Panoramic views · Sunset bar</div></div>
+          </div>
+
+          <div class="venue-section-label">🎭 Entertainment</div>
+          <div class="venue-grid">
+            <div class="venue-card" onclick="selectVenue('Neptune Lounge')"><div class="venue-card-icon">🎶</div><div class="venue-card-name">Neptune Lounge</div><div class="venue-card-cap">Live music · Shows · Cultural performances</div></div>
+            <div class="venue-card" onclick="selectVenue('Coral Club')"><div class="venue-card-icon">🎤</div><div class="venue-card-name">Coral Club</div><div class="venue-card-cap">Late-night dancing · Live music · Karaoke</div></div>
+          </div>
+
+          <div class="venue-section-label">📚 Spaces</div>
+          <div class="venue-grid">
+            <div class="venue-card" onclick="selectVenue('Library')"><div class="venue-card-icon">📖</div><div class="venue-card-name">Library</div><div class="venue-card-cap">Deck 5 · Books · Games · Quiet reading</div></div>
+            <div class="venue-card" onclick="selectVenue('Business Center')"><div class="venue-card-icon">💼</div><div class="venue-card-name">Business Center</div><div class="venue-card-cap">Deck 5 · Private offices · Starlink internet</div></div>
+          </div>
+
+          <div class="venue-section-label">💪 Wellness &amp; Recreation</div>
+          <div class="venue-grid">
+            <div class="venue-card" onclick="selectVenue('Fitness Center')"><div class="venue-card-icon">🏋️</div><div class="venue-card-name">Fitness Center</div><div class="venue-card-cap">Deck 7 Aft · Cardio · Weights · Yoga</div></div>
+            <div class="venue-card" onclick="selectVenue('Pool Deck')"><div class="venue-card-icon">🏊</div><div class="venue-card-name">Pool Deck</div><div class="venue-card-cap">Deck 8 · Pools · Jacuzzis · Ocean views</div></div>
+            <div class="venue-card" onclick="selectVenue('Pickleball Court')"><div class="venue-card-icon">🏓</div><div class="venue-card-name">Pickleball Court</div><div class="venue-card-cap">Deck 8 · Open play daily</div></div>
+            <div class="venue-card" onclick="selectVenue('The Spa')"><div class="venue-card-icon">💆</div><div class="venue-card-name">The Spa</div><div class="venue-card-cap">Deck 3 · Massages · Sauna · Steam room</div></div>
+            <div class="venue-card" onclick="selectVenue('Medical Center')"><div class="venue-card-icon">🏥</div><div class="venue-card-name">Medical Center</div><div class="venue-card-cap">Deck 3 · 24/7 · Full medical services</div></div>
+          </div>
+
+          <div class="section-header" style="margin-top:28px">
             <div><div class="section-title">Reservation Request</div><div class="section-sub">Our hotel team will confirm within 24 hours</div></div>
           </div>
           <div class="admin-panel" style="background:var(--white)">
@@ -718,7 +750,31 @@
             <div class="form-group"><label class="form-label">Venue *</label>
               <select id="venVenue" class="form-select">
                 <option value="">Select a venue...</option>
-                <option>Venue</option>
+                <optgroup label="Dining">
+                  <option>Thistle Restaurant</option>
+                  <option>Palms Café</option>
+                </optgroup>
+                <optgroup label="Bars &amp; Lounges">
+                  <option>Morning Light Pub</option>
+                  <option>Mike's Bar</option>
+                  <option>The Observatory</option>
+                </optgroup>
+                <optgroup label="Entertainment">
+                  <option>Neptune Lounge</option>
+                  <option>Coral Club</option>
+                </optgroup>
+                <optgroup label="Spaces">
+                  <option>Library</option>
+                  <option>Business Center</option>
+                </optgroup>
+                <optgroup label="Wellness &amp; Recreation">
+                  <option>Fitness Center</option>
+                  <option>Pool Deck</option>
+                  <option>Pickleball Court</option>
+                  <option>The Spa</option>
+                  <option>Medical Center</option>
+                </optgroup>
+                <option>Other</option>
               </select>
             </div>
             <div class="form-row">
