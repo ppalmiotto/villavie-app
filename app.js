@@ -1,5 +1,96 @@
 // ══════════════════════════════════════════════
 //  VILLA VIE RESIDENCES — app.js
+
+// ── SPA CART (must be defined before renderSpaMenu) ──────────────
+var spaCartItems = [];
+
+function handleSpaAdd(b) {
+  addToSpaCart(b.getAttribute('data-name'), b.getAttribute('data-duration'), b.getAttribute('data-price'));
+}
+
+function addToSpaCart(name, dur, price) {
+  if (spaCartItems.find(function(i) { return i.name === name; })) {
+    if (typeof showToast === 'function') showToast(name + ' already added');
+    return;
+  }
+  spaCartItems.push({ name: name, duration: dur, price: price });
+  updateSpaCartUI();
+  if (typeof showToast === 'function') showToast(name + ' added ✓');
+}
+
+function removeFromSpaCart(name) {
+  spaCartItems = spaCartItems.filter(function(i) { return i.name !== name; });
+  updateSpaCartUI();
+  renderSpaCartItems();
+  updateApptTreatmentList();
+}
+
+function spaRemoveClick(btn) {
+  removeFromSpaCart(btn.getAttribute('data-name'));
+}
+
+function updateSpaCartUI() {
+  var c = document.getElementById('spaCart');
+  var n = document.getElementById('spaCartCount');
+  if (c) c.style.display = spaCartItems.length ? 'flex' : 'none';
+  if (n) n.textContent = spaCartItems.length;
+  updateApptTreatmentList();
+  document.querySelectorAll('.spa-add-btn').forEach(function(b) {
+    var x = spaCartItems.find(function(i) { return i.name === b.getAttribute('data-name'); });
+    b.textContent = x ? '✓ Added' : '+ Add';
+    b.classList.toggle('btn-added', !!x);
+  });
+}
+
+function updateApptTreatmentList() {
+  var el = document.getElementById('apptTreatmentList');
+  if (!el) return;
+  el.innerHTML = spaCartItems.map(function(i) {
+    return '<div class="spa-selected-item"><span>' + i.name + (i.duration ? ' · ' + i.duration : '') + '</span>' +
+      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
+  }).join('');
+}
+
+function openSpaCart() {
+  var p = document.getElementById('spaCartPanel');
+  if (p) { p.style.display = 'block'; renderSpaCartItems(); p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+function closeSpaCart() {
+  var p = document.getElementById('spaCartPanel');
+  if (p) p.style.display = 'none';
+}
+
+function renderSpaCartItems() {
+  var el = document.getElementById('spaCartItems');
+  if (!el) return;
+  if (!spaCartItems.length) {
+    el.innerHTML = '<div style="color:var(--text-light);font-size:14px;padding:8px 0">No treatments selected.</div>';
+    return;
+  }
+  el.innerHTML = spaCartItems.map(function(i) {
+    return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + i.name + '</div>' +
+      '<div class="spa-cart-item-detail">' + (i.duration || '') + (i.price ? ' · ' + i.price : '') + '</div></div>' +
+      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
+  }).join('');
+}
+
+function proceedToBook() {
+  closeSpaCart();
+  var s = document.getElementById('spaApptSection');
+  if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+window.handleSpaAdd = handleSpaAdd;
+window.addToSpaCart = addToSpaCart;
+window.removeFromSpaCart = removeFromSpaCart;
+window.spaRemoveClick = spaRemoveClick;
+window.updateSpaCartUI = updateSpaCartUI;
+window.openSpaCart = openSpaCart;
+window.closeSpaCart = closeSpaCart;
+window.proceedToBook = proceedToBook;
+// ─────────────────────────────────────────────────────────────────
+
 // ══════════════════════════════════════════════
 
 // ── ADMIN CREDENTIALS ────────────────────────
