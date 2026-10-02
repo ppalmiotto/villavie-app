@@ -400,7 +400,7 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
 
 // ══════════════════════════════════════════════
 //  POLLS
@@ -561,7 +561,7 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
 
 // ══════════════════════════════════════════════
 //  POLLS
@@ -575,6 +575,7 @@ function switchTab(id, tab) {
   if (tab) tab.classList.add('active');
   if (id === 'updates') document.getElementById('updatesBadge').classList.remove('show');
   if (id === 'groups') { if (typeof loadGroups === 'function') loadGroups(); }
+  if (id === 'schedule') { if (typeof initDayNav === 'function') initDayNav(); }
   if (id === 'chat') {
     document.getElementById('chatBadge')?.classList.remove('show');
     if (typeof onChatTabOpen === 'function') onChatTabOpen();
@@ -851,7 +852,7 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
 
 // SUB-TAB SWITCHER
 function switchSubTab(contentId, btnId) {
@@ -1470,3 +1471,29 @@ window.createGroup = createGroup;
 window.joinGroup = joinGroup;
 window.leaveGroup = leaveGroup;
 window.deleteGroup = deleteGroup;
+
+// ── DYNAMIC DAY NAV ──────────────────────────
+function initDayNav() {
+  var container = document.getElementById('dayNavContainer');
+  if (!container) return;
+
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var today = new Date();
+  var html = '';
+
+  for (var i = 0; i < 5; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
+    var activeClass = i === 0 ? ' active' : '';
+    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
+  }
+  container.innerHTML = html;
+
+  // Also update scheduleDate
+  var dateEl = document.getElementById('scheduleDate');
+  if (dateEl) {
+    dateEl.textContent = 'Today — ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+}
+window.initDayNav = initDayNav;
