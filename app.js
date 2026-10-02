@@ -35,15 +35,14 @@ function initSegments() {
 // ── SCHEDULE DATA ─────────────────────────────
 const scheduleData = {
   0: [
-    { time: '06:30 AM', title: 'Sunrise Yoga', location: 'Sun Deck, Level 11', category: 'wellness' },
-    { time: '07:00 AM', title: 'Breakfast Service Opens', location: 'The Grand Dining Room', category: 'dining' },
-    { time: '08:00 AM', title: 'Shore Excursions Depart', location: 'Gangway, Level 3', category: 'port' },
-    { time: '10:00 AM', title: 'Watercolour Class', location: 'Arts Studio, Level 8', category: 'activity' },
-    { time: '12:30 PM', title: 'Poolside Barbecue Lunch', location: 'Lido Pool Deck', category: 'dining' },
-    { time: '03:00 PM', title: 'Afternoon Tea', location: 'The Drawing Room', category: 'dining' },
-    { time: '06:00 PM', title: 'Cocktail Hour', location: 'Sky Bar, Level 12', category: 'entertainment' },
-    { time: '07:30 PM', title: 'Gala Dinner — Formal Night', location: 'The Grand Dining Room', category: 'dining' },
-    { time: '09:30 PM', title: 'Live Jazz Performance', location: 'Atrium Stage', category: 'entertainment' },
+    { time: '24 hrs', title: 'Library Open — Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
+    { time: '7:00 AM', title: 'Library Quiet Time', location: 'Library, Deck 5 Mid', category: 'activity' },
+    { time: '9:00 AM', title: 'Ring Toss & Ladderball Open Play', location: 'Morning Light, Deck 5 Mid', category: 'activity' },
+    { time: '9:00 AM', title: 'Pickleball Open Play', location: 'Open Deck, Deck 8 Mid', category: 'activity' },
+    { time: '9:00 AM', title: 'Table Tennis Open Play', location: 'Open Deck, Deck 8 Mid', category: 'activity' },
+    { time: '9:00 AM', title: 'Bean Bag Toss Open Play', location: 'Open Deck, Deck 8 Mid', category: 'activity' },
+    { time: '9:00 AM', title: 'Shuffleboard Open Play', location: 'Open Deck, Deck 5 Fwd', category: 'activity' },
+    { time: '10:00 AM', title: 'Library Open for Games', location: 'Library, Deck 5 Mid', category: 'activity' },
   ],
   1: [
     { time: '07:00 AM', title: 'Tai Chi on Deck', location: 'Sun Deck, Level 11', category: 'wellness' },
