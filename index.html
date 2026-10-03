@@ -367,7 +367,8 @@
       <div class="view-inner">
 
         <!-- EMERGENCY MESSAGE — Admin only -->
-        <div id="emergencyAdminBtn" class="admin-only" style="margin-bottom:16px">
+        <div class="admin-only" style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-info-alert" onclick="toggleForm('infoComposeForm')">ℹ️ Post Ship Notice</button>
           <button class="btn-emergency" onclick="toggleForm('emergencyComposeForm')">
             🚨 Send Emergency Alert
           </button>
@@ -388,6 +389,24 @@
             <button class="btn-emergency" onclick="sendEmergencyAlert()">🚨 Send Alert Now</button>
             <button class="btn-outline" onclick="clearEmergencyAlert()">✓ Clear Active Alert</button>
             <button class="btn-outline" onclick="hideForm('emergencyComposeForm')">Cancel</button>
+          </div>
+        </div>
+
+        <!-- INFO ALERT COMPOSE -->
+        <div id="infoComposeForm" class="info-compose admin-only" style="display:none">
+          <div class="info-compose-title">ℹ️ Post Ship Notice</div>
+          <div style="font-size:13px;color:#1a56a0;margin-bottom:12px">This will appear as a blue banner at the top of the app for all residents.</div>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input id="infoAlertTitle" class="form-input" placeholder="e.g. Full Crew Drill Today" maxlength="80">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea id="infoAlertBody" class="form-textarea" placeholder="Message details..." rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-info-alert" onclick="sendInfoAlert()">ℹ️ Post Notice</button>
+            <button class="btn-outline" onclick="hideForm('infoComposeForm')">Cancel</button>
           </div>
         </div>
 

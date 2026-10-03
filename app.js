@@ -1587,3 +1587,37 @@ function initDayNav() {
   }
 }
 window.initDayNav = initDayNav;
+
+// ── INFO BANNER ──────────────────────────────
+function sendInfoAlert() {
+  var title = document.getElementById('infoAlertTitle').value.trim();
+  var body = document.getElementById('infoAlertBody').value.trim();
+  if (!title || !body) { showToast('Please fill in title and message'); return; }
+  showInfoBanner(title, body);
+  hideForm('infoComposeForm');
+  document.getElementById('infoAlertTitle').value = '';
+  document.getElementById('infoAlertBody').value = '';
+  showToast('Ship notice posted ✓');
+}
+
+function showInfoBanner(title, body) {
+  var banner = document.getElementById('infoBanner');
+  var t = document.getElementById('infoBannerTitle');
+  var b = document.getElementById('infoBannerBody');
+  var time = document.getElementById('infoBannerTime');
+  if (!banner) return;
+  if (t) t.textContent = title;
+  if (b) b.textContent = body;
+  if (time) time.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  banner.classList.add('show');
+  banner.style.display = 'block';
+}
+
+function dismissInfoBanner() {
+  var banner = document.getElementById('infoBanner');
+  if (banner) { banner.classList.remove('show'); banner.style.display = 'none'; }
+}
+
+window.sendInfoAlert = sendInfoAlert;
+window.showInfoBanner = showInfoBanner;
+window.dismissInfoBanner = dismissInfoBanner;
