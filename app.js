@@ -371,29 +371,7 @@ window.renderSegmentFilter = renderSegmentFilter;
 window.selectSegment = selectSegment;
 window.showItinDetail = showItinDetail;
 
-// ── EXPOSE OTHER APP GLOBALS ──────────────────
-window.switchTab = switchTab;
-window.syncTopNav = syncTopNav;
-window.toggleForm = toggleForm;
-window.hideForm = hideForm;
-window.showToast = showToast;
-window.toggleAdminLogin = toggleAdminLogin;
-window.closeAdminModal = closeAdminModal;
-window.doLogin = doLogin;
-window.postUpdate = postUpdate;
-window.addEvent = addEvent;
-window.selectDay = selectDay;
-window.addTreatment = addTreatment;
-window.submitApptRequest = submitApptRequest;
-window.addSafetyInfo = addSafetyInfo;
-window.toggleSafety = toggleSafety;
-window.sendEmergencyAlert = sendEmergencyAlert;
-window.resolveAlert = resolveAlert;
-window.clearEmergencyAlert = clearEmergencyAlert;
-window.createPoll = createPoll;
-window.castVote = castVote;
-window.closePoll = closePoll;
-window.escapeHtml = escapeHtml;
+
 
 
 // ── RENDER SCHEDULE ──────────────────────────
@@ -807,7 +785,6 @@ function sendInfoAlert() {
   document.getElementById('infoAlertBody').value = '';
   show
 
-window.addEventListener('DOMContentLoaded', init);
 
 // ══════════════════════════════════════════════
 //  POLLS
@@ -1876,3 +1853,5 @@ window.joinGroup = joinGroup;
 window.leaveGroup = leaveGroup;
 window.deleteGroup = deleteGroup;
 }
+
+window.addEventListener('DOMContentLoaded', init);
