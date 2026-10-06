@@ -371,7 +371,29 @@ window.renderSegmentFilter = renderSegmentFilter;
 window.selectSegment = selectSegment;
 window.showItinDetail = showItinDetail;
 
-
+// ── EXPOSE OTHER APP GLOBALS ──────────────────
+window.switchTab = switchTab;
+window.syncTopNav = syncTopNav;
+window.toggleForm = toggleForm;
+window.hideForm = hideForm;
+window.showToast = showToast;
+window.toggleAdminLogin = toggleAdminLogin;
+window.closeAdminModal = closeAdminModal;
+window.doLogin = doLogin;
+window.postUpdate = postUpdate;
+window.addEvent = addEvent;
+window.selectDay = selectDay;
+window.addTreatment = addTreatment;
+window.submitApptRequest = submitApptRequest;
+window.addSafetyInfo = addSafetyInfo;
+window.toggleSafety = toggleSafety;
+window.sendEmergencyAlert = sendEmergencyAlert;
+window.resolveAlert = resolveAlert;
+window.clearEmergencyAlert = clearEmergencyAlert;
+window.createPoll = createPoll;
+window.castVote = castVote;
+window.closePoll = closePoll;
+window.escapeHtml = escapeHtml;
 
 
 // ── RENDER SCHEDULE ──────────────────────────
@@ -389,204 +411,454 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-// ── SPA CART (must be defined before renderSpaMenu) ──────────────
-var spaCartItems = [];
 
-function handleSpaAdd(b) {
-  addToSpaCart(b.getAttribute('data-name'), b.getAttribute('data-duration'), b.getAttribute('data-price'));
+// ══════════════════════════════════════════════
+//  POLLS
+// ══════════════════════════════════════════════
+
+var pollsData = [];
+
+async function loadPolls() {
+  if (!window.sbClient) return;
+  const { data, error } = await window.sbClient
+    .from('polls')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('Polls load error:', error); return; }
+  pollsData = data || [];
+  renderPolls();
 }
 
-function addToSpaCart(name, dur, price) {
-  if (spaCartItems.find(function(i) { return i.name === name; })) {
-    if (typeof showToast === 'function') showToast(name + ' already added');
-    return;
-  }
-  spaCartItems.push({ name: name, duration: dur, price: price });
-  updateSpaCartUI();
-  if (typeof showToast === 'function') showToast(name + ' added ✓');
-}
-
-function removeFromSpaCart(name) {
-  spaCartItems = spaCartItems.filter(function(i) { return i.name !== name; });
-  updateSpaCartUI();
-  renderSpaCartItems();
-  updateApptTreatmentList();
-}
-
-function spaRemoveClick(btn) {
-  removeFromSpaCart(btn.getAttribute('data-name'));
-}
-
-function updateSpaCartUI() {
-  var c = document.getElementById('spaCart');
-  var n = document.getElementById('spaCartCount');
-  if (c) c.style.display = spaCartItems.length ? 'flex' : 'none';
-  if (n) n.textContent = spaCartItems.length;
-  updateApptTreatmentList();
-  document.querySelectorAll('.spa-add-btn').forEach(function(b) {
-    var x = spaCartItems.find(function(i) { return i.name === b.getAttribute('data-name'); });
-    b.textContent = x ? '✓ Added' : '+ Add';
-    b.classList.toggle('btn-added', !!x);
-  });
-}
-
-function updateApptTreatmentList() {
-  var el = document.getElementById('apptTreatmentList');
+function renderPolls() {
+  const el = document.getElementById('pollList');
   if (!el) return;
-  el.innerHTML = spaCartItems.map(function(i) {
-    return '<div class="spa-selected-item"><span>' + i.name + (i.duration ? ' - ' + i.duration : '') + '</span>' +
-      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
+  if (!pollsData.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = pollsData.map(poll => {
+    const options = JSON.parse(poll.options);
+    const votes = JSON.parse(poll.votes || '{}');
+    const userVote = votes[(typeof currentUser !== 'undefined' ? currentUser?.email : '') || ''];
+    const totalVotes = Object.values(votes).length;
+
+    const optionsHTML = options.map((opt, i) => {
+      const count = Object.values(votes).filter(v => v === i).length;
+      const pct = totalVotes ? Math.round((count / totalVotes) * 100) : 0;
+      const isVoted = userVote === i;
+      return `
+        <div class="poll-option ${isVoted ? 'poll-option-voted' : ''}" onclick="${userVote === undefined ? `castVote('${poll.id}', ${i})` : ''}">
+          <div class="poll-option-bar" style="width:${pct}%"></div>
+          <div class="poll-option-content">
+            <span class="poll-option-text">${escapeHtml(opt)}</span>
+            <span class="poll-option-pct">${userVote !== undefined ? `${pct}%` : ''}</span>
+            ${isVoted ? '<span class="poll-check">✓</span>' : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    const posted = new Date(poll.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+    return `
+      <div class="poll-card">
+        <div class="poll-header">
+          <span class="poll-label">📊 Poll</span>
+          <span class="poll-date">${posted}</span>
+          ${isAdmin ? `<button class="poll-close-btn" onclick="closePoll('${poll.id}')" title="Close poll">✕</button>` : ''}
+        </div>
+        <div class="poll-question">${escapeHtml(poll.question)}</div>
+        ${optionsHTML}
+        <div class="poll-footer">${totalVotes} vote${totalVotes !== 1 ? 's' : ''}${userVote === undefined ? ' . Tap to vote' : ''}</div>
+      </div>`;
   }).join('');
 }
 
-function openSpaCart() {
-  var p = document.getElementById('spaCartPanel');
-  if (p) { p.style.display = 'block'; renderSpaCartItems(); p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+async function createPoll() {
+  if (!window.sbClient) return;
+  const question = document.getElementById('pollQuestion').value.trim();
+  const opts = [0,1,2,3].map(i => document.getElementById(`pollOpt${i}`)?.value.trim()).filter(Boolean);
+  if (!question) { showToast('Please enter a question'); return; }
+  if (opts.length < 2) { showToast('Please enter at least 2 options'); return; }
+
+  const { error } = await window.sbClient.from('polls').insert([{
+    question,
+    options: JSON.stringify(opts),
+    votes: '{}',
+    created_by: (typeof currentUser !== 'undefined' ? currentUser?.email : '') || 'admin',
+    active: true
+  }]);
+
+  if (error) { console.error('Poll create error:', error); showToast('Error creating poll'); return; }
+
+  hideForm('addPollForm');
+  document.getElementById('pollQuestion').value = '';
+  [0,1,2,3].forEach(i => { const el = document.getElementById(`pollOpt${i}`); if (el) el.value = ''; });
+  showToast('Poll posted ✓');
+  await loadPolls();
 }
 
-function closeSpaCart() {
-  var p = document.getElementById('spaCartPanel');
-  if (p) p.style.display = 'none';
+async function castVote(pollId, optionIndex) {
+  if (!window.sbClient) return;
+  const userEmail = (typeof currentUser !== 'undefined' ? currentUser?.email : '') || '';
+  if (!userEmail) { showToast('Please log in to vote'); return; }
+
+  const { data, error } = await window.sbClient.from('polls').select('votes').eq('id', pollId).single();
+  if (error) return;
+
+  const votes = JSON.parse(data.votes || '{}');
+  if (votes[userEmail] !== undefined) { showToast('You have already voted'); return; }
+  votes[userEmail] = optionIndex;
+
+  await window.sbClient.from('polls').update({ votes: JSON.stringify(votes) }).eq('id', pollId);
+  await loadPolls();
+  showToast('Vote cast ✓');
 }
 
-function renderSpaCartItems() {
-  var el = document.getElementById('spaCartItems');
+async function closePoll(pollId) {
+  if (!window.sbClient) return;
+  await window.sbClient.from('polls').delete().eq('id', pollId);
+  await loadPolls();
+  showToast('Poll removed');
+}
+
+// Helper used by polls (may not be in scope from chat.js)
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+window.createPoll = createPoll;
+window.castVote = castVote;
+window.closePoll = closePoll;
+
+// ── EXPOSE OTHER APP GLOBALS ──────────────────
+window.switchTab = switchTab;
+window.syncTopNav = syncTopNav;
+window.toggleForm = toggleForm;
+window.hideForm = hideForm;
+window.showToast = showToast;
+window.toggleAdminLogin = toggleAdminLogin;
+window.closeAdminModal = closeAdminModal;
+window.doLogin = doLogin;
+window.postUpdate = postUpdate;
+window.addEvent = addEvent;
+window.selectDay = selectDay;
+window.addTreatment = addTreatment;
+window.submitApptRequest = submitApptRequest;
+window.addSafetyInfo = addSafetyInfo;
+window.toggleSafety = toggleSafety;
+window.sendEmergencyAlert = sendEmergencyAlert;
+window.resolveAlert = resolveAlert;
+window.clearEmergencyAlert = clearEmergencyAlert;
+window.createPoll = createPoll;
+window.castVote = castVote;
+window.closePoll = closePoll;
+window.escapeHtml = escapeHtml;
+
+
+// ── RENDER SCHEDULE ──────────────────────────
+function renderSchedule(dayIndex) {
+  var events = scheduleData[dayIndex] || [];
+  var el = document.getElementById('eventList');
   if (!el) return;
-  if (!spaCartItems.length) {
-    el.innerHTML = '<div style="color:var(--text-light);font-size:14px;padding:8px 0">No treatments selected.</div>';
+  if (!events.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
     return;
   }
-  el.innerHTML = spaCartItems.map(function(i) {
-    return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + i.name + '</div>' +
-      '<div class="spa-cart-item-detail">' + (i.duration || '') + (i.price ? ' - ' + i.price : '') + '</div></div>' +
-      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
+  el.innerHTML = events.map(function(e) {
+    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
   }).join('');
 }
-
-function proceedToBook() {
-  closeSpaCart();
-  var s = document.getElementById('spaApptSection');
-  if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-window.handleSpaAdd = handleSpaAdd;
-window.addToSpaCart = addToSpaCart;
-window.removeFromSpaCart = removeFromSpaCart;
-window.spaRemoveClick = spaRemoveClick;
-window.updateSpaCartUI = updateSpaCartUI;
-window.openSpaCart = openSpaCart;
-window.closeSpaCart = closeSpaCart;
-window.proceedToBook = proceedToBook;
-// ─────────────────────────────────────────────────────────────────
+window.renderSchedule = renderSchedule;
 
 
-// ── DYNAMIC DAY NAV ──────────────────────────
-function initDayNav() {
-  var container = document.getElementById('dayNavContainer');
-  if (!container) return;
+// ══════════════════════════════════════════════
+//  POLLS
 
-  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  var today = new Date();
-  var html = '';
+// ═══════════════════════════════════════════════
 
-  for (var i = 0; i < 5; i++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + i);
-    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
-    var activeClass = i === 0 ? ' active' : '';
-    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
-  }
-  container.innerHTML = html;
-
-  // Also update scheduleDate
-  var dateEl = document.getElementById('scheduleDate');
-  if (dateEl) {
-    dateEl.textContent = 'Today -- ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+function switchTab(id, tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab, .bnav-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (tab) tab.classList.add('active');
+  if (id === 'updates') document.getElementById('updatesBadge').classList.remove('show');
+  if (id === 'groups') { if (typeof loadGroups === 'function') loadGroups(); }
+  if (id === 'chat') {
+    document.getElementById('chatBadge')?.classList.remove('show');
+    if (typeof onChatTabOpen === 'function') onChatTabOpen();
   }
 }
-window.initDayNav = initDayNav;
 
-
-// ── INFO BANNER ──────────────────────────────
-function sendInfoAlert() {
-  var title = document.getElementById('infoAlertTitle').value.trim();
-  var body = document.getElementById('infoAlertBody').value.trim();
-  if (!title || !body) { showToast('Please fill in title and message'); return; }
-  showInfoBanner(title, body);
-  hideForm('infoComposeForm');
-  document.getElementById('infoAlertTitle').value = '';
-  document.getElementById('infoAlertBody').value = '';
-  showToast('Ship notice posted ✓');
+function syncTopNav(id) {
+  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'groups', 'chat'];
+  document.querySelectorAll('.nav-tab').forEach((t, i) => t.classList.toggle('active', tabMap[i] === id));
 }
 
-function showInfoBanner(title, body) {
-  var banner = document.getElementById('infoBanner');
-  var t = document.getElementById('infoBannerTitle');
-  var b = document.getElementById('infoBannerBody');
-  var time = document.getElementById('infoBannerTime');
-  if (!banner) return;
-  if (t) t.textContent = title;
-  if (b) b.textContent = body;
-  if (time) time.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+function selectDay(idx, btn) {
+  currentDay = idx;
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchedule(idx);
+}
+
+function toggleSafety(i) {
+  safetyData[i].open = !safetyData[i].open;
+  document.getElementById('safety-body-' + i).classList.toggle('open', safetyData[i].open);
+  document.getElementById('chevron-' + i).textContent = safetyData[i].open ? '▲' : '▼';
+}
+
+
+function closeExcursionModal() { document.getElementById('excursionModal').classList.remove('open'); }
+
+// ── EMERGENCY ALERTS ─────────────────────────
+
+async function sendEmergencyAlert() {
+  const title = document.getElementById('emgTitle').value.trim();
+  const body = document.getElementById('emgBody').value.trim();
+  if (!title || !body) { showToast('Please fill in both fields'); return; }
+  showToast('Sending alert...');
+  const ok = await postEmergencyAlertToDb(title, body);
+  if (!ok) return;
+  hideForm('emergencyComposeForm');
+  document.getElementById('emgTitle').value = '';
+  document.getElementById('emgBody').value = '';
+  document.getElementById('updatesBadge').classList.add('show');
+  showToast('🚨 Emergency alert sent to all residents');
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('🚨 EMERGENCY -- Villa Vie Odyssey', { body: `${title}: ${body}`, icon: 'icons/icon-192.png', requireInteraction: true });
+  }
+}
+
+async function resolveAlert(idx) {
+  const msg = emergencyMessages[idx];
+  if (!msg) return;
+  const ok = await resolveAlertInDb(msg.id);
+  if (!ok) return;
+  showToast('Alert marked as resolved');
+}
+
+async function clearEmergencyAlert() {
+  const ok = await clearAllAlertsInDb();
+  if (!ok) return;
+  showToast('All alerts cleared');
+}
+
+function showEmergencyBanner(title, body, time) {
+  document.getElementById('emgBannerTitle').textContent = title;
+  document.getElementById('emgBannerBody').textContent = body;
+  document.getElementById('emgBannerTime').textContent = 'Issued ' + time;
+  const banner = document.getElementById('emergencyBanner');
   banner.classList.add('show');
-  banner.style.display = 'block';
+  // Push app content down so banner doesn't overlap header
+  document.getElementById('app').style.marginTop = banner.offsetHeight + 'px';
 }
 
-function dismissInfoBanner() {
-  var banner = document.getElementById('infoBanner');
-  if (banner) { banner.classList.remove('show'); banner.style.display = 'none'; }
+function dismissEmergencyBanner() {
+  document.getElementById('emergencyBanner').classList.remove('show');
+  document.getElementById('app').style.marginTop = '0';
 }
 
-window.sendInfoAlert = sendInfoAlert;
-window.showInfoBanner = showInfoBanner;
-window.dismissInfoBanner = dismissInfoBanner;
+// ── ADMIN AUTH ────────────────────────────────
 
-
-// ── PDF UPLOADS IN UPDATES ────────────────────
-var _selectedPdfFile = null;
-var SUPABASE_URL_BASE = 'https://xqpvqztphkenokkjrzef.supabase.co';
-
-function handlePdfSelect(input) {
-  var file = input.files[0];
-  if (!file) return;
-  _selectedPdfFile = file;
-  var label = document.getElementById('pdfUploadLabel');
-  var area = document.getElementById('pdfUploadArea');
-  if (label) label.textContent = '📄 ' + file.name + ' (' + Math.round(file.size/1024) + 'KB)';
-  if (area) area.classList.add('pdf-selected');
+function toggleAdminLogin() {
+  if (isAdmin) { logoutAdmin(); return; }
+  document.getElementById('adminModal').classList.add('open');
+  document.getElementById('loginError').style.display = 'none';
 }
 
-function clearPdfUpload() {
-  _selectedPdfFile = null;
-  var input = document.getElementById('pdfFileInput');
-  if (input) input.value = '';
-  var label = document.getElementById('pdfUploadLabel');
-  var area = document.getElementById('pdfUploadArea');
-  if (label) label.textContent = 'Tap to attach a PDF';
-  if (area) area.classList.remove('pdf-selected');
-}
+function closeAdminModal() { document.getElementById('adminModal').classList.remove('open'); }
 
-async function uploadPdfToSupabase(file) {
-  if (!sbClient) return null;
-  var fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  try {
-    var { data, error } = await sbClient.storage
-      .from('update-pdfs')
-      .upload(fileName, file, { contentType: 'application/pdf', upsert: false });
-    if (error) throw error;
-    var { data: urlData } = sbClient.storage
-      .from('update-pdfs')
-      .getPublicUrl(fileName);
-    return { url: urlData.publicUrl, name: file.name };
-  } catch(e) {
-    console.error('PDF upload error:', e);
-    return null;
+function doLogin() {
+  const email = document.getElementById('adminEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('adminPass').value;
+  if (ADMIN_CREDENTIALS.some(c => c.email === email && c.password === pass)) {
+    isAdmin = true;
+    closeAdminModal();
+    document.getElementById('adminBadge').style.display = 'inline-block';
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+    showToast('Welcome, crew member ✓');
+    sessionStorage.setItem('vv_admin', '1');
+  } else {
+    document.getElementById('loginError').style.display = 'block';
   }
 }
 
-window.handlePdfSelect = handlePdfSelect;
-window.clearPdfUpload = clearPdfUpload;
+function logoutAdmin() {
+  isAdmin = false;
+  document.getElementById('adminBadge').style.display = 'none';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  ['addPortForm','addEventForm','addUpdateForm','emergencyComposeForm','addSafetyForm'].forEach(hideForm);
+  sessionStorage.removeItem('vv_admin');
+  showToast('Signed out');
+}
 
+// ── ADMIN -- PORTS ─────────────────────────────
+
+
+
+function addEvent() {
+  const time = document.getElementById('evTime').value.trim();
+  const title = document.getElementById('evTitle').value.trim();
+  const location = document.getElementById('evLocation').value.trim();
+  const category = document.getElementById('evCat').value;
+  if (!time || !title) { showToast('Please fill required fields'); return; }
+  if (!scheduleData[currentDay]) scheduleData[currentDay] = [];
+  scheduleData[currentDay].push({ time, title, location, category });
+  renderSchedule(currentDay);
+  hideForm('addEventForm');
+  ['evTime','evTitle','evLocation'].forEach(id => document.getElementById(id).value = '');
+  showToast('Event added ✓');
+}
+
+// ── ADMIN -- UPDATES ───────────────────────────
+
+async function postUpdate() {
+  const title = document.getElementById('newUpdateTitle').value.trim();
+  const body = document.getElementById('newUpdateBody').value.trim();
+  const cat = document.getElementById('newUpdateCat').value;
+  const notif = document.getElementById('newUpdateNotif').value;
+  if (!title || !body) { showToast('Please fill in all fields'); return; }
+  showToast('Posting...');
+  const ok = await postUpdateToDb(title, body, cat);
+  if (!ok) return;
+  hideForm('addUpdateForm');
+  document.getElementById('newUpdateTitle').value = '';
+  document.getElementById('newUpdateBody').value = '';
+  if (notif === 'yes') showNotification(`📢 ${title}`);
+  showToast('Update posted ✓');
+}
+
+// ── ADMIN -- SAFETY ─────────────────────────────
+
+function addSafetyInfo() {
+  const title = document.getElementById('safetyTitle').value.trim();
+  const body = document.getElementById('safetyBody').value.trim();
+  if (!title || !body) { showToast('Please fill in all fields'); return; }
+  safetyData.push({ icon: '📋', title, open: false, content: `<p>${body.replace(/\n/g, '</p><p>')}</p>` });
+  renderSafety();
+  hideForm('addSafetyForm');
+  document.getElementById('safetyTitle').value = '';
+  document.getElementById('safetyBody').value = '';
+  showToast('Safety info added ✓');
+}
+
+// ── NOTIFICATIONS ─────────────────────────────
+
+function showNotification(message) {
+  const banner = document.getElementById('notifBanner');
+  document.getElementById('notifText').textContent = message;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 6000);
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Villa Vie Residences', { body: message, icon: 'icons/icon-192.png' });
+  }
+}
+
+function dismissNotif() { document.getElementById('notifBanner').classList.remove('show'); }
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => { if (p === 'granted') showToast('Notifications enabled ✓'); });
+  }
+}
+
+// ── HELPERS ───────────────────────────────────
+
+function toggleForm(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function hideForm(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ──────────────────────────────────────
+
+function init() {
+  const dateEl = document.getElementById('scheduleDate');
+  if (dateEl) dateEl.textContent = 'Today -- ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Enter key on admin password field
+  const passField = document.getElementById('adminPass');
+  if (passField) passField.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // Restore admin session
+  if (sessionStorage.getItem('vv_admin')) {
+    isAdmin = true;
+    document.getElementById('adminBadge').style.display = 'inline-block';
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+  }
+
+  setTimeout(requestNotificationPermission, 4000);
+
+  // Hide splash then hand off to auth
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hidden');
+    initSupabase();
+    initAuth(); // auth.js handles login screen vs app
+  }, 1800);
+}
+
+
+// ── EXPOSE CALENDAR GLOBALS ───────────────────
+window.calPrev = calPrev;
+window.calNext = calNext;
+window.setCalView = setCalView;
+window.renderCalendar = renderCalendar;
+window.showPortDetail = showPortDetail;
+window.closePortDetail = closePortDetail;
+window.selectSegment = selectSegment;
+window.renderSegmentFilter = renderSegmentFilter;
+window.renderPorts = renderPorts;
+window.buildPortIndex = buildPortIndex;
+window.initSegments = initSegments;
+
+// ── EXPOSE OTHER APP GLOBALS ──────────────────
+window.switchTab = switchTab;
+window.syncTopNav = syncTopNav;
+window.toggleForm = toggleForm;
+window.hideForm = hideForm;
+window.showToast = showToast;
+window.toggleAdminLogin = toggleAdminLogin;
+window.closeAdminModal = closeAdminModal;
+window.doLogin = doLogin;
+window.postUpdate = postUpdate;
+window.addEvent = addEvent;
+window.selectDay = selectDay;
+window.addTreatment = addTreatment;
+window.submitApptRequest = submitApptRequest;
+window.addSafetyInfo = addSafetyInfo;
+window.toggleSafety = toggleSafety;
+window.sendEmergencyAlert = sendEmergencyAlert;
+window.resolveAlert = resolveAlert;
+window.clearEmergencyAlert = clearEmergencyAlert;
+window.createPoll = createPoll;
+window.castVote = castVote;
+window.closePoll = closePoll;
+window.escapeHtml = escapeHtml;
+
+
+// ── RENDER SCHEDULE ──────────────────────────
+function renderSchedule(dayIndex) {
+  var events = scheduleData[dayIndex] || [];
+  var el = document.getElementById('eventList');
+  if (!el) return;
+  if (!events.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
+    return;
+  }
+  el.innerHTML = events.map(function(e) {
+    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
+  }).join('');
+}
+window.renderSchedule = renderSchedule;
 
 // ══════════════════════════════════════════════
 //  COMMUNITY GROUPS
@@ -1328,6 +1600,233 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
+
+// ── DYNAMIC DAY NAV ──────────────────────────
+function initDayNav() {
+  var container = document.getElementById('dayNavContainer');
+  if (!container) return;
+
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var today = new Date();
+  var html = '';
+
+  for (var i = 0; i < 5; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
+    var activeClass = i === 0 ? ' active' : '';
+    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
+  }
+  container.innerHTML = html;
+
+  // Also update scheduleDate
+  var dateEl = document.getElementById('scheduleDate');
+  if (dateEl) {
+    dateEl.textContent = 'Today -- ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+}
+window.initDayNav = initDayNav;
+
+// ── INFO BANNER ──────────────────────────────
+function sendInfoAlert() {
+  var title = document.getElementById('infoAlertTitle').value.trim();
+  var body = document.getElementById('infoAlertBody').value.trim();
+  if (!title || !body) { showToast('Please fill in title and message'); return; }
+  showInfoBanner(title, body);
+  hideForm('infoComposeForm');
+  document.getElementById('infoAlertTitle').value = '';
+  document.getElementById('infoAlertBody').value = '';
+  showToast('Ship notice posted ✓');
+}
+
+function showInfoBanner(title, body) {
+  var banner = document.getElementById('infoBanner');
+  var t = document.getElementById('infoBannerTitle');
+  var b = document.getElementById('infoBannerBody');
+  var time = document.getElementById('infoBannerTime');
+  if (!banner) return;
+  if (t) t.textContent = title;
+  if (b) b.textContent = body;
+  if (time) time.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  banner.classList.add('show');
+  banner.style.display = 'block';
+}
+
+function dismissInfoBanner() {
+  var banner = document.getElementById('infoBanner');
+  if (banner) { banner.classList.remove('show'); banner.style.display = 'none'; }
+}
+
+window.sendInfoAlert = sendInfoAlert;
+window.showInfoBanner = showInfoBanner;
+window.dismissInfoBanner = dismissInfoBanner;
+
+// ── PDF UPLOADS IN UPDATES ────────────────────
+var _selectedPdfFile = null;
+var SUPABASE_URL_BASE = 'https://xqpvqztphkenokkjrzef.supabase.co';
+
+function handlePdfSelect(input) {
+  var file = input.files[0];
+  if (!file) return;
+  _selectedPdfFile = file;
+  var label = document.getElementById('pdfUploadLabel');
+  var area = document.getElementById('pdfUploadArea');
+  if (label) label.textContent = '📄 ' + file.name + ' (' + Math.round(file.size/1024) + 'KB)';
+  if (area) area.classList.add('pdf-selected');
+}
+
+function clearPdfUpload() {
+  _selectedPdfFile = null;
+  var input = document.getElementById('pdfFileInput');
+  if (input) input.value = '';
+  var label = document.getElementById('pdfUploadLabel');
+  var area = document.getElementById('pdfUploadArea');
+  if (label) label.textContent = 'Tap to attach a PDF';
+  if (area) area.classList.remove('pdf-selected');
+}
+
+async function uploadPdfToSupabase(file) {
+  if (!sbClient) return null;
+  var fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  try {
+    var { data, error } = await sbClient.storage
+      .from('update-pdfs')
+      .upload(fileName, file, { contentType: 'application/pdf', upsert: false });
+    if (error) throw error;
+    var { data: urlData } = sbClient.storage
+      .from('update-pdfs')
+      .getPublicUrl(fileName);
+    return { url: urlData.publicUrl, name: file.name };
+  } catch(e) {
+    console.error('PDF upload error:', e);
+    return null;
+  }
+}
+
+window.handlePdfSelect = handlePdfSelect;
+window.clearPdfUpload = clearPdfUpload;
+
+}
+
+window.addEventListener('DOMContentLoaded', init);
+
+// SUB-TAB SWITCHER
+function switchSubTab(contentId, btnId) {
+  document.querySelectorAll('.sub-tab-content').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.combined-tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  var content = document.getElementById(contentId);
+  var btn = document.getElementById(btnId);
+  if (content) content.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (contentId === 'chat-content') { var cb = document.getElementById('chatBadge'); if (cb) cb.classList.remove('show'); }
+}
+function switchToChatSection() {
+  switchTab('updates', null);
+  syncTopNav('updates');
+  setTimeout(function() { switchSubTab('chat-content','subTabChat'); if (typeof onChatTabOpen === 'function') onChatTabOpen(); }, 50);
+}
+window.switchSubTab = switchSubTab;
+window.switchToChatSection = switchToChatSection;
+
+// VENUE RESERVATIONS
+var EMAILJS_PUBLIC_KEY  = 'UF53xY4ntPoJpgJXv';
+var EMAILJS_SERVICE_ID  = 'service_6czdfnq';
+var EMAILJS_TEMPLATE_ID = 'template_ijgiiux';
+var _venueEquipment = [];
+var _emailJsReady = false;
+
+function initEmailJS() {
+  if (typeof emailjs === 'undefined') return;
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  _emailJsReady = true;
+}
+function selectVenue(name) {
+  var sel = document.getElementById('venVenue');
+  if (sel) { sel.value = name; var el = document.getElementById('venName'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+}
+function updateEquipment() {
+  _venueEquipment = Array.from(document.querySelectorAll('.equipment-item input:checked')).map(function(cb) { return cb.value; });
+}
+async function submitVenueRequest() {
+  var name    = document.getElementById('venName').value.trim();
+  var cabin   = document.getElementById('venCabin').value.trim();
+  var venue   = document.getElementById('venVenue').value;
+  var date    = document.getElementById('venDate').value;
+  var time    = document.getElementById('venTime') ? document.getElementById('venTime').value : '';
+  var notes   = document.getElementById('venNotes') ? document.getElementById('venNotes').value.trim() : '';
+  var errEl   = document.getElementById('venError');
+  var confEl  = document.getElementById('venConfirmation');
+  var btn     = document.getElementById('venSubmitBtn');
+
+  if (!name || !cabin || !venue || !date) {
+    if (errEl) { errEl.textContent = 'Please fill in all required fields.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+  if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var equipment = _venueEquipment.length ? _venueEquipment.join(', ') : '';
+
+  try {
+    // Save to Supabase
+    if (sbClient) {
+      var { error } = await sbClient.from('venue_bookings').insert({
+        venue: venue, resident_name: name, cabin: cabin,
+        date: date, time_slot: time, equipment: equipment,
+        notes: notes, status: 'pending'
+      });
+      if (error) throw error;
+    }
+
+    // Also send email notification
+    if (_emailJsReady) {
+      var params = {
+        to_email: 'hotel_director@vvodyssey.com', from_name: name, cabin: cabin,
+        venue: venue, date: new Date(date).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+        time: time || 'Not specified', equipment: equipment || 'None', notes: notes || 'None',
+        submitted_at: new Date().toLocaleString('en-GB')
+      };
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    }
+
+    if (confEl) confEl.style.display = 'block';
+    if (btn) btn.textContent = 'Request Sent ✓';
+    showToast('Venue request submitted ✓');
+    ['venName','venCabin','venTime','venNotes'].forEach(function(id) { var e = document.getElementById(id); if (e) e.value = ''; });
+    document.getElementById('venVenue').value = '';
+    document.getElementById('venDate').value = '';
+    document.querySelectorAll('.equipment-item input').forEach(function(cb) { cb.checked = false; });
+    _venueEquipment = [];
+  } catch(err) {
+    console.error('Venue submit error:', err);
+    if (confEl) { confEl.textContent = 'Request received. Please also contact the hotel team at extension 100.'; confEl.style.display = 'block'; }
+    if (btn) { btn.textContent = 'Send Request'; btn.disabled = false; }
+  }
+}
+// SKIP OLD FUNCTION
+window.selectVenue = selectVenue;
+window.updateEquipment = updateEquipment;
+window.submitVenueRequest = submitVenueRequest;
+window.initEmailJS = initEmailJS;
+
+// ══════════════════════════════════════════════
+//  TAB FREEZE RECOVERY
+// ══════════════════════════════════════════════
+
+var _lastVisibleAt = Date.now();
+var _reconnectTimer = null;
+
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    _lastVisibleAt = Date.now();
+  } else {
+    var awayMs = Date.now() - _lastVisibleAt;
+    if (awayMs > 20000) { // away more than 20 seconds
+      _reconnectAfterFreeze();
+    }
+  }
+});
+
 window.addEventListener('focus', function() {
   var awayMs = Date.now() - _lastVisibleAt;
   if (awayMs > 20000) _reconnectAfterFreeze();
@@ -1371,7 +1870,7 @@ setInterval(function() {
 var menuData = {
   breakfast: ['Continental Buffet', 'Eggs Benedict with Smoked Salmon', 'Fresh Tropical Fruit Station', 'Freshly Baked Pastries & Breads', 'Juices, Teas & Specialty Coffees'],
   lunch: ['Poolside Barbecue', 'Classic Caesar Salad', 'Chilled Gazpacho', 'Grilled Fish of the Day', 'Artisan Dessert Selection'],
-  dinner: ['Amuse-Bouche from the Chef', 'Seared Scallops with Cauliflower Puree', 'Lobster Bisque', 'Prime Beef Tenderloin - Pan-seared Sea Bass', 'Souffle du Jour - Cheese Selection']
+  dinner: ['Amuse-Bouche from the Chef', 'Seared Scallops with Cauliflower Puree', 'Lobster Bisque', 'Prime Beef Tenderloin . Pan-seared Sea Bass', 'Souffle du Jour . Cheese Selection']
 };
 
 function saveMenu() {
@@ -1385,7 +1884,7 @@ function saveMenu() {
     if (!el) return;
     var items = text.split('\n').filter(function(l) { return l.trim(); });
     el.innerHTML = items.map(function(item) {
-      return '<div class="menu-item">' + item.trim().replace(/^[-•-]\s*/, '') + '</div>';
+      return '<div class="menu-item">' + item.trim().replace(/^[.•-]\s*/, '') + '</div>';
     }).join('');
   }
 
@@ -1574,7 +2073,7 @@ function renderVenueCalendar() {
 
     if (dayBookings.length > 0) {
       dayBookings.forEach(function(b) {
-        html += '<div class="vcal-booking" title="' + b.venue + (b.time_slot ? ' - ' + b.time_slot : '') + '">' +
+        html += '<div class="vcal-booking" title="' + b.venue + (b.time_slot ? ' . ' + b.time_slot : '') + '">' +
           b.venue.split(' ')[0] + (b.venue.split(' ')[1] ? ' ' + b.venue.split(' ')[1] : '') +
           '</div>';
       });
@@ -1629,11 +2128,11 @@ function venueRequestCard(b) {
     '<div class="venue-req-header">' +
       '<div>' +
         '<div class="venue-req-venue">' + b.venue + '</div>' +
-        '<div class="venue-req-meta">' + b.resident_name + (b.cabin ? ' - ' + b.cabin : '') + '</div>' +
+        '<div class="venue-req-meta">' + b.resident_name + (b.cabin ? ' . ' + b.cabin : '') + '</div>' +
       '</div>' +
       '<span class="venue-req-status" style="color:' + statusColor + '">' + b.status.toUpperCase() + '</span>' +
     '</div>' +
-    '<div class="venue-req-detail">📅 ' + date + (b.time_slot ? ' - ' + b.time_slot : '') + '</div>' +
+    '<div class="venue-req-detail">📅 ' + date + (b.time_slot ? ' . ' + b.time_slot : '') + '</div>' +
     (b.equipment ? '<div class="venue-req-detail">🔧 ' + b.equipment + '</div>' : '') +
     (b.notes ? '<div class="venue-req-detail">📝 ' + b.notes + '</div>' : '') +
     (b.status === 'pending' ?
@@ -1828,6 +2327,3 @@ window.createGroup = createGroup;
 window.joinGroup = joinGroup;
 window.leaveGroup = leaveGroup;
 window.deleteGroup = deleteGroup;
-}
-
-window.addEventListener('DOMContentLoaded', init);
