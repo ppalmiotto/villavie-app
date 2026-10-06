@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════
-//  VILLA VIE RESIDENCES — app.js
+//  VILLA VIE RESIDENCES -- app.js
 // ══════════════════════════════════════════════
 
 // ── ADMIN CREDENTIALS ────────────────────────
@@ -35,7 +35,7 @@ function initSegments() {
 // ── SCHEDULE DATA ─────────────────────────────
 const scheduleData = {
   0: [
-    { time: '24 hrs', title: 'Library Open — Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
+    { time: '24 hrs', title: 'Library Open -- Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
     { time: '7:00 AM', title: 'Library Quiet Time', location: 'Library, Deck 5 Mid', category: 'activity' },
     { time: '8:00 AM', title: 'Introduction to Resistance Stretching with Sally', location: 'Fitness Center, Deck 7 Aft', category: 'wellness' },
     { time: '9:00 AM', title: 'Ring Toss & Ladderball Open Play', location: 'Morning Light, Deck 5 Mid', category: 'activity' },
@@ -53,11 +53,11 @@ const scheduleData = {
     { time: '2:00 PM', title: 'Werewolf Event (Max 35 players)', location: 'Library, Deck 5 Mid', category: 'entertainment' },
     { time: '4:00 PM', title: 'Goddess Dance Class with Amira Mor', location: 'Dance Studio, Deck 3 Mid', category: 'wellness' },
     { time: '5:00 PM', title: 'Afternoon Trivia with Big Mac', location: 'Morning Light, Deck 5 Fwd', category: 'entertainment' },
-    { time: '8:30 PM', title: "Aliona's 17th Birthday Party — Western Theme!", location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
+    { time: '8:30 PM', title: "Aliona's 17th Birthday Party -- Western Theme!", location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
     { time: '8:30 PM', title: "Speakers Corner: How the Odyssey Community Began", location: 'Coral Club, Deck 5 Aft', category: 'entertainment' },
   ],
   1: [
-    { time: '24 hrs', title: 'Library Open — Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
+    { time: '24 hrs', title: 'Library Open -- Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
     { time: '7:00 AM', title: 'Library Quiet Time', location: 'Library, Deck 5 Mid', category: 'activity' },
     { time: '9:00 AM', title: 'Ring Toss & Ladderball Open Play', location: 'Morning Light, Deck 5 Mid', category: 'activity' },
     { time: '9:00 AM', title: 'Pickleball Open Play', location: 'Open Deck, Deck 8 Mid', category: 'activity' },
@@ -69,7 +69,7 @@ const scheduleData = {
   2: [
     { time: '06:00 AM', title: 'Early Shore Call', location: 'Gangway, Level 3', category: 'port' },
     { time: '07:00 AM', title: 'Breakfast Service Opens', location: 'The Grand Dining Room', category: 'dining' },
-    { time: '01:30 PM', title: 'Light Lunch — Open Seating', location: 'Lido Restaurant', category: 'dining' },
+    { time: '01:30 PM', title: 'Light Lunch -- Open Seating', location: 'Lido Restaurant', category: 'dining' },
     { time: '07:30 PM', title: 'Gala Dinner', location: 'The Grand Dining Room', category: 'dining' },
     { time: '10:00 PM', title: 'DJ Set', location: 'Coral Club, Deck 5', category: 'entertainment' },
   ],
@@ -129,37 +129,37 @@ const spaMenu = [
   { name: 'Hand or Foot Treatment', category: 'enhancement', icon: '🤲', duration: '35 min', price: '$39', desc: 'Experience a luxurious hand or foot treatment.' },
 
   // HAIR SALON
-  { name: 'Shampoo & Style', category: 'salon', icon: '💇', duration: '—', price: '$40', desc: 'Professional shampoo and blow dry styling by our in-house hair team.' },
-  { name: 'Cut', category: 'salon', icon: '✂️', duration: '—', price: '$32', desc: 'Precision haircut by our experienced stylists.' },
-  { name: 'Color', category: 'salon', icon: '🎨', duration: '—', price: '$52', desc: 'Full hair colour service using professional products.' },
-  { name: 'Gloss', category: 'salon', icon: '✨', duration: '—', price: '$39', desc: 'A glossing treatment to add shine and vibrancy to your hair.' },
-  { name: 'Color & Lightning', category: 'salon', icon: '⚡', duration: '—', price: '$72', desc: 'Combined colour and lightening service for a multi-dimensional look.' },
-  { name: 'Contrasts', category: 'salon', icon: '🖤', duration: '—', price: '$84', desc: 'Bold contrast colour techniques for a striking finish.' },
-  { name: 'Highlight', category: 'salon', icon: '🌟', duration: '—', price: '$72', desc: 'Expert highlighting to add dimension and brightness.' },
-  { name: 'Hairstyling', category: 'salon', icon: '💫', duration: '—', price: '$39', desc: 'Professional styling for any occasion — from casual to formal.' },
-  { name: 'Rituals Add-On (AVEDA)', category: 'salon', icon: '🌱', duration: '—', price: '$19', desc: 'AVEDA Shampoo, Mask and Texturizer/Thermique add-on.' },
-  { name: 'AVEDA Shampoo', category: 'salon', icon: '🌱', duration: '—', price: '$7', desc: 'Premium AVEDA shampoo treatment.' },
-  { name: 'AVEDA Mask', category: 'salon', icon: '🌱', duration: '—', price: '$7', desc: 'Nourishing AVEDA hair mask treatment.' },
-  { name: 'Flat Iron Straightener', category: 'salon', icon: '💈', duration: '—', price: '$12', desc: 'Professional flat iron straightening service.' },
-  { name: 'Extension Fee', category: 'salon', icon: '💇', duration: '—', price: '$13', desc: 'Additional fee applicable for hair extensions.' },
+  { name: 'Shampoo & Style', category: 'salon', icon: '💇', duration: '--', price: '$40', desc: 'Professional shampoo and blow dry styling by our in-house hair team.' },
+  { name: 'Cut', category: 'salon', icon: '✂️', duration: '--', price: '$32', desc: 'Precision haircut by our experienced stylists.' },
+  { name: 'Color', category: 'salon', icon: '🎨', duration: '--', price: '$52', desc: 'Full hair colour service using professional products.' },
+  { name: 'Gloss', category: 'salon', icon: '✨', duration: '--', price: '$39', desc: 'A glossing treatment to add shine and vibrancy to your hair.' },
+  { name: 'Color & Lightning', category: 'salon', icon: '⚡', duration: '--', price: '$72', desc: 'Combined colour and lightening service for a multi-dimensional look.' },
+  { name: 'Contrasts', category: 'salon', icon: '🖤', duration: '--', price: '$84', desc: 'Bold contrast colour techniques for a striking finish.' },
+  { name: 'Highlight', category: 'salon', icon: '🌟', duration: '--', price: '$72', desc: 'Expert highlighting to add dimension and brightness.' },
+  { name: 'Hairstyling', category: 'salon', icon: '💫', duration: '--', price: '$39', desc: 'Professional styling for any occasion -- from casual to formal.' },
+  { name: 'Rituals Add-On (AVEDA)', category: 'salon', icon: '🌱', duration: '--', price: '$19', desc: 'AVEDA Shampoo, Mask and Texturizer/Thermique add-on.' },
+  { name: 'AVEDA Shampoo', category: 'salon', icon: '🌱', duration: '--', price: '$7', desc: 'Premium AVEDA shampoo treatment.' },
+  { name: 'AVEDA Mask', category: 'salon', icon: '🌱', duration: '--', price: '$7', desc: 'Nourishing AVEDA hair mask treatment.' },
+  { name: 'Flat Iron Straightener', category: 'salon', icon: '💈', duration: '--', price: '$12', desc: 'Professional flat iron straightening service.' },
+  { name: 'Extension Fee', category: 'salon', icon: '💇', duration: '--', price: '$13', desc: 'Additional fee applicable for hair extensions.' },
 
   // BEAUTY
-  { name: 'Half / Full Legs Wax', category: 'beauty', icon: '🦵', duration: '—', price: '$45', desc: 'Professional waxing for half or full legs.' },
-  { name: 'Underarms Wax', category: 'beauty', icon: '💪', duration: '—', price: '$20', desc: 'Underarm waxing for smooth, clean results.' },
-  { name: 'Lower Arms Wax', category: 'beauty', icon: '🤲', duration: '—', price: '$25', desc: 'Professional lower arm waxing.' },
-  { name: 'Full Arms Wax', category: 'beauty', icon: '🤲', duration: '—', price: '$40', desc: 'Full arm waxing for smooth results.' },
-  { name: 'Lip / Chin or Eyebrows Wax', category: 'beauty', icon: '🧖', duration: '—', price: '$15', desc: 'Precise facial waxing for lip, chin or eyebrow shaping.' },
-  { name: 'Bikini Line Wax', category: 'beauty', icon: '🌸', duration: '—', price: '$25', desc: 'Professional bikini line waxing.' },
+  { name: 'Half / Full Legs Wax', category: 'beauty', icon: '🦵', duration: '--', price: '$45', desc: 'Professional waxing for half or full legs.' },
+  { name: 'Underarms Wax', category: 'beauty', icon: '💪', duration: '--', price: '$20', desc: 'Underarm waxing for smooth, clean results.' },
+  { name: 'Lower Arms Wax', category: 'beauty', icon: '🤲', duration: '--', price: '$25', desc: 'Professional lower arm waxing.' },
+  { name: 'Full Arms Wax', category: 'beauty', icon: '🤲', duration: '--', price: '$40', desc: 'Full arm waxing for smooth results.' },
+  { name: 'Lip / Chin or Eyebrows Wax', category: 'beauty', icon: '🧖', duration: '--', price: '$15', desc: 'Precise facial waxing for lip, chin or eyebrow shaping.' },
+  { name: 'Bikini Line Wax', category: 'beauty', icon: '🌸', duration: '--', price: '$25', desc: 'Professional bikini line waxing.' },
   { name: 'Spa Manicure', category: 'beauty', icon: '💅', duration: '60 min', price: '$65', desc: 'A relaxing spa manicure with full nail care and polish.' },
   { name: 'Express Manicure', category: 'beauty', icon: '💅', duration: '25 min', price: '$30', desc: 'A quick yet thorough manicure for beautiful nails.' },
   { name: 'Spa Pedicure', category: 'beauty', icon: '🦶', duration: '60 min', price: '$85', desc: 'A luxurious spa pedicure with full foot care and polish.' },
   { name: 'Express Pedicure', category: 'beauty', icon: '🦶', duration: '30 min', price: '$40', desc: 'A quick yet thorough pedicure.' },
-  { name: 'Nail Reconstruction', category: 'beauty', icon: '✨', duration: '—', price: '$115', desc: 'Full nail reconstruction service.' },
-  { name: 'Reconstruction or Repair Single Nail', category: 'beauty', icon: '💅', duration: '—', price: '$18', desc: 'Single nail reconstruction or repair.' },
-  { name: 'Gel Overlay on Natural Nails', category: 'beauty', icon: '💅', duration: '—', price: '$59', desc: 'Gel overlay applied over natural nails for a long-lasting finish.' },
-  { name: 'Semi Permanent Nail Polish', category: 'beauty', icon: '💅', duration: '—', price: '$10', desc: 'Semi-permanent nail polish add-on.' },
-  { name: 'French Nails', category: 'beauty', icon: '💅', duration: '—', price: '$15', desc: 'Classic French nail finish add-on.' },
-  { name: 'Makeup', category: 'beauty', icon: '💄', duration: '—', price: 'from $39', desc: 'Professional makeup application for any occasion.' },
+  { name: 'Nail Reconstruction', category: 'beauty', icon: '✨', duration: '--', price: '$115', desc: 'Full nail reconstruction service.' },
+  { name: 'Reconstruction or Repair Single Nail', category: 'beauty', icon: '💅', duration: '--', price: '$18', desc: 'Single nail reconstruction or repair.' },
+  { name: 'Gel Overlay on Natural Nails', category: 'beauty', icon: '💅', duration: '--', price: '$59', desc: 'Gel overlay applied over natural nails for a long-lasting finish.' },
+  { name: 'Semi Permanent Nail Polish', category: 'beauty', icon: '💅', duration: '--', price: '$10', desc: 'Semi-permanent nail polish add-on.' },
+  { name: 'French Nails', category: 'beauty', icon: '💅', duration: '--', price: '$15', desc: 'Classic French nail finish add-on.' },
+  { name: 'Makeup', category: 'beauty', icon: '💄', duration: '--', price: 'from $39', desc: 'Professional makeup application for any occasion.' },
 ];
 
 const catIcons = { massage: '💆', facial: '✨', ritual: '🌿', enhancement: '⭐', salon: '💇', beauty: '💅' };
@@ -234,17 +234,17 @@ function submitApptRequest() {
 // ── SAFETY DATA ───────────────────────────────
 const safetyData = [
   { icon: '🆘', title: 'Muster Stations & Life Jackets', open: true,
-    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 4–6: Muster Station A — Atrium, Level 4</li><li>Decks 7–9: Muster Station B — Grand Dining Room</li><li>Decks 10–12: Muster Station C — Sky Bar, Level 12</li></ul>` },
+    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 4-6: Muster Station A -- Atrium, Level 4</li><li>Decks 7-9: Muster Station B -- Grand Dining Room</li><li>Decks 10-12: Muster Station C -- Sky Bar, Level 12</li></ul>` },
   { icon: '🔥', title: 'Fire Safety', open: false,
     content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 11 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
   { icon: '🏥', title: 'Medical Centre', open: false,
-    content: `<p>The Medical Centre is on Deck 3 forward, staffed 24 hours.</p><ul><li>Emergency: extension 911</li><li>Non-emergency: extension 302</li><li>Walk-in hours: 8:00–10:00 AM and 5:00–7:00 PM</li></ul>` },
+    content: `<p>The Medical Centre is on Deck 3 forward, staffed 24 hours.</p><ul><li>Emergency: extension 911</li><li>Non-emergency: extension 302</li><li>Walk-in hours: 8:00-10:00 AM and 5:00-7:00 PM</li></ul>` },
   { icon: '🌊', title: 'Man Overboard Procedure', open: false,
-    content: `<ul><li>Shout "Man Overboard" loudly and call the bridge on extension 0</li><li>Throw the nearest lifebuoy ring toward the person</li><li>Keep the person in sight — do NOT jump in after them</li></ul>` },
+    content: `<ul><li>Shout "Man Overboard" loudly and call the bridge on extension 0</li><li>Throw the nearest lifebuoy ring toward the person</li><li>Keep the person in sight -- do NOT jump in after them</li></ul>` },
   { icon: '☀️', title: 'Sun & Heat Safety', open: false,
-    content: `<ul><li>Apply SPF 30+ sunscreen every 2 hours when on deck or ashore</li><li>Stay hydrated — at least 2 litres of water per day in warm ports</li><li>Seek shade between 11:00 AM and 3:00 PM</li></ul>` },
+    content: `<ul><li>Apply SPF 30+ sunscreen every 2 hours when on deck or ashore</li><li>Stay hydrated -- at least 2 litres of water per day in warm ports</li><li>Seek shade between 11:00 AM and 3:00 PM</li></ul>` },
   { icon: '🔒', title: 'Personal Security', open: false,
-    content: `<ul><li>Use the in-room safe for valuables and passports</li><li>Your cabin key card is your port ID — do not lend it to others</li><li>Report suspicious activity to Security on extension 500</li></ul>` },
+    content: `<ul><li>Use the in-room safe for valuables and passports</li><li>Your cabin key card is your port ID -- do not lend it to others</li><li>Report suspicious activity to Security on extension 500</li></ul>` },
 ];
 
 // ── EMERGENCY MESSAGES ───────────────────────
@@ -434,7 +434,7 @@ function updateApptTreatmentList() {
   var el = document.getElementById('apptTreatmentList');
   if (!el) return;
   el.innerHTML = spaCartItems.map(function(i) {
-    return '<div class="spa-selected-item"><span>' + i.name + (i.duration ? ' · ' + i.duration : '') + '</span>' +
+    return '<div class="spa-selected-item"><span>' + i.name + (i.duration ? ' - ' + i.duration : '') + '</span>' +
       '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
   }).join('');
 }
@@ -458,7 +458,7 @@ function renderSpaCartItems() {
   }
   el.innerHTML = spaCartItems.map(function(i) {
     return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + i.name + '</div>' +
-      '<div class="spa-cart-item-detail">' + (i.duration || '') + (i.price ? ' · ' + i.price : '') + '</div></div>' +
+      '<div class="spa-cart-item-detail">' + (i.duration || '') + (i.price ? ' - ' + i.price : '') + '</div></div>' +
       '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
   }).join('');
 }
@@ -501,7 +501,7 @@ function initDayNav() {
   // Also update scheduleDate
   var dateEl = document.getElementById('scheduleDate');
   if (dateEl) {
-    dateEl.textContent = 'Today — ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    dateEl.textContent = 'Today -- ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   }
 }
 window.initDayNav = initDayNav;
@@ -816,7 +816,7 @@ function renderPolls() {
         </div>
         <div class="poll-question">${escapeHtml(poll.question)}</div>
         ${optionsHTML}
-        <div class="poll-footer">${totalVotes} vote${totalVotes !== 1 ? 's' : ''}${userVote === undefined ? ' · Tap to vote' : ''}</div>
+        <div class="poll-footer">${totalVotes} vote${totalVotes !== 1 ? 's' : ''}${userVote === undefined ? ' - Tap to vote' : ''}</div>
       </div>`;
   }).join('');
 }
@@ -967,7 +967,7 @@ async function sendEmergencyAlert() {
   const title = document.getElementById('emgTitle').value.trim();
   const body = document.getElementById('emgBody').value.trim();
   if (!title || !body) { showToast('Please fill in both fields'); return; }
-  showToast('Sending alert…');
+  showToast('Sending alert...');
   const ok = await postEmergencyAlertToDb(title, body);
   if (!ok) return;
   hideForm('emergencyComposeForm');
@@ -976,7 +976,7 @@ async function sendEmergencyAlert() {
   document.getElementById('updatesBadge').classList.add('show');
   showToast('🚨 Emergency alert sent to all residents');
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('🚨 EMERGENCY — Villa Vie Odyssey', { body: `${title}: ${body}`, icon: 'icons/icon-192.png', requireInteraction: true });
+    new Notification('🚨 EMERGENCY -- Villa Vie Odyssey', { body: `${title}: ${body}`, icon: 'icons/icon-192.png', requireInteraction: true });
   }
 }
 
@@ -1043,7 +1043,7 @@ function logoutAdmin() {
   showToast('Signed out');
 }
 
-// ── ADMIN — PORTS ─────────────────────────────
+// ── ADMIN -- PORTS ─────────────────────────────
 
 
 
@@ -1061,7 +1061,7 @@ function addEvent() {
   showToast('Event added ✓');
 }
 
-// ── ADMIN — UPDATES ───────────────────────────
+// ── ADMIN -- UPDATES ───────────────────────────
 
 async function postUpdate() {
   const title = document.getElementById('newUpdateTitle').value.trim();
@@ -1069,7 +1069,7 @@ async function postUpdate() {
   const cat = document.getElementById('newUpdateCat').value;
   const notif = document.getElementById('newUpdateNotif').value;
   if (!title || !body) { showToast('Please fill in all fields'); return; }
-  showToast('Posting…');
+  showToast('Posting...');
   const ok = await postUpdateToDb(title, body, cat);
   if (!ok) return;
   hideForm('addUpdateForm');
@@ -1079,7 +1079,7 @@ async function postUpdate() {
   showToast('Update posted ✓');
 }
 
-// ── ADMIN — SAFETY ─────────────────────────────
+// ── ADMIN -- SAFETY ─────────────────────────────
 
 function addSafetyInfo() {
   const title = document.getElementById('safetyTitle').value.trim();
@@ -1133,7 +1133,7 @@ function showToast(msg) {
 
 function init() {
   const dateEl = document.getElementById('scheduleDate');
-  if (dateEl) dateEl.textContent = 'Today — ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  if (dateEl) dateEl.textContent = 'Today -- ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   // Enter key on admin password field
   const passField = document.getElementById('adminPass');
@@ -1355,7 +1355,7 @@ function _reconnectAfterFreeze() {
   if (typeof subscribeToEmergencyAlerts === 'function') subscribeToEmergencyAlerts();
 }
 
-// Keep-alive ping every 4 minutes — only fires when tab is visible
+// Keep-alive ping every 4 minutes -- only fires when tab is visible
 // Prevents Supabase WebSocket from closing after 5min of inactivity
 setInterval(function() {
   if (document.hidden) return;
@@ -1371,7 +1371,7 @@ setInterval(function() {
 var menuData = {
   breakfast: ['Continental Buffet', 'Eggs Benedict with Smoked Salmon', 'Fresh Tropical Fruit Station', 'Freshly Baked Pastries & Breads', 'Juices, Teas & Specialty Coffees'],
   lunch: ['Poolside Barbecue', 'Classic Caesar Salad', 'Chilled Gazpacho', 'Grilled Fish of the Day', 'Artisan Dessert Selection'],
-  dinner: ['Amuse-Bouche from the Chef', 'Seared Scallops with Cauliflower Purée', 'Lobster Bisque', 'Prime Beef Tenderloin · Pan-seared Sea Bass', 'Soufflé du Jour · Cheese Selection']
+  dinner: ['Amuse-Bouche from the Chef', 'Seared Scallops with Cauliflower Puree', 'Lobster Bisque', 'Prime Beef Tenderloin - Pan-seared Sea Bass', 'Souffle du Jour - Cheese Selection']
 };
 
 function saveMenu() {
@@ -1385,7 +1385,7 @@ function saveMenu() {
     if (!el) return;
     var items = text.split('\n').filter(function(l) { return l.trim(); });
     el.innerHTML = items.map(function(item) {
-      return '<div class="menu-item">' + item.trim().replace(/^[·•-]\s*/, '') + '</div>';
+      return '<div class="menu-item">' + item.trim().replace(/^[-•-]\s*/, '') + '</div>';
     }).join('');
   }
 
@@ -1574,7 +1574,7 @@ function renderVenueCalendar() {
 
     if (dayBookings.length > 0) {
       dayBookings.forEach(function(b) {
-        html += '<div class="vcal-booking" title="' + b.venue + (b.time_slot ? ' · ' + b.time_slot : '') + '">' +
+        html += '<div class="vcal-booking" title="' + b.venue + (b.time_slot ? ' - ' + b.time_slot : '') + '">' +
           b.venue.split(' ')[0] + (b.venue.split(' ')[1] ? ' ' + b.venue.split(' ')[1] : '') +
           '</div>';
       });
@@ -1629,11 +1629,11 @@ function venueRequestCard(b) {
     '<div class="venue-req-header">' +
       '<div>' +
         '<div class="venue-req-venue">' + b.venue + '</div>' +
-        '<div class="venue-req-meta">' + b.resident_name + (b.cabin ? ' · ' + b.cabin : '') + '</div>' +
+        '<div class="venue-req-meta">' + b.resident_name + (b.cabin ? ' - ' + b.cabin : '') + '</div>' +
       '</div>' +
       '<span class="venue-req-status" style="color:' + statusColor + '">' + b.status.toUpperCase() + '</span>' +
     '</div>' +
-    '<div class="venue-req-detail">📅 ' + date + (b.time_slot ? ' · ' + b.time_slot : '') + '</div>' +
+    '<div class="venue-req-detail">📅 ' + date + (b.time_slot ? ' - ' + b.time_slot : '') + '</div>' +
     (b.equipment ? '<div class="venue-req-detail">🔧 ' + b.equipment + '</div>' : '') +
     (b.notes ? '<div class="venue-req-detail">📝 ' + b.notes + '</div>' : '') +
     (b.status === 'pending' ?
