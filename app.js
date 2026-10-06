@@ -808,121 +808,46 @@ function addEvent() {
 // ── ADMIN — UPDATES ───────────────────────────
 
 async function postUpdate() {
-  const title = document.getElementById('newUpdateTitle').value.trim();
-  const body = document.getElementById('newUpdateBody').value.trim();
-  const cat = document.getElementById('newUpdateCat').value;
-  const notif = document.getElementById('newUpdateNotif').value;
-  if (!title || !body) { showToast('Please fill in all fields'); return; }
-  showToast('Posting…');
-  const ok = await postUpdateToDb(title, body, cat);
-  if (!ok) return;
-  hideForm('addUpdateForm');
-  document.getElementById('newUpdateTitle').value = '';
-  document.getElementById('newUpdateBody').value = '';
-  if (notif === 'yes') showNotification(`📢 ${title}`);
-  showToast('Update posted ✓');
-}
-
-// ── ADMIN — SAFETY ─────────────────────────────
-
-function addSafetyInfo() {
-  const title = document.getElementById('safetyTitle').value.trim();
-  const body = document.getElementById('safetyBody').value.trim();
-  if (!title || !body) { showToast('Please fill in all fields'); return; }
-  safetyData.push({ icon: '📋', title, open: false, content: `<p>${body.replace(/\n/g, '</p><p>')}</p>` });
-  renderSafety();
-  hideForm('addSafetyForm');
-  document.getElementById('safetyTitle').value = '';
-  document.getElementById('safetyBody').value = '';
-  showToast('Safety info added ✓');
-}
-
-// ── NOTIFICATIONS ─────────────────────────────
-
-function showNotification(message) {
-  const banner = document.getElementById('notifBanner');
-  document.getElementById('notifText').textContent = message;
-  banner.classList.add('show');
-  setTimeout(() => banner.classList.remove('show'), 6000);
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('Villa Vie Residences', { body: message, icon: 'icons/icon-192.png' });
+  var title = (document.getElementById('newUpdateTitle') || document.getElementById('updateTitle'));
+  var body = document.getElementById('newUpdateBody');
+  var cat = document.getElementById('newUpdateCat');
+  
+  if (!title || !body) return;
+  var t = title.value.trim();
+  var b = body.value.trim();
+  if (!t || !b) { showToast('Please fill in title and message'); return; }
+  
+  var btn = document.getElementById('postUpdateBtn');
+  if (btn) { btn.textContent = 'Posting...'; btn.disabled = true; }
+  
+  var pdfUrl = null, pdfName = null;
+  if (_selectedPdfFile) {
+    if (btn) btn.textContent = 'Uploading PDF...';
+    var pdfResult = await uploadPdfToSupabase(_selectedPdfFile);
+    if (pdfResult) { pdfUrl = pdfResult.url; pdfName = pdfResult.name; }
+    else { showToast('PDF upload failed — posting without attachment'); }
+  }
+  
+  try {
+    var { error } = await sbClient.from('updates').insert({
+      title: t, body: b,
+      category: cat ? cat.value : 'general',
+      pdf_url: pdfUrl, pdf_name: pdfName
+    });
+    if (error) throw error;
+    hideForm('addUpdateForm');
+    title.value = ''; body.value = '';
+    if (cat) cat.value = 'general';
+    clearPdfUpload();
+    if (btn) { btn.textContent = 'Post Update'; btn.disabled = false; }
+    showToast('Update posted ✓');
+    loadUpdates();
+  } catch(e) {
+    console.error('postUpdate error:', e);
+    if (btn) { btn.textContent = 'Post Update'; btn.disabled = false; }
+    showToast('Error posting update');
   }
 }
-
-function dismissNotif() { document.getElementById('notifBanner').classList.remove('show'); }
-
-function requestNotificationPermission() {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then(p => { if (p === 'granted') showToast('Notifications enabled ✓'); });
-  }
-}
-
-// ── HELPERS ───────────────────────────────────
-
-function toggleForm(id) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-function hideForm(id) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = 'none';
-}
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// ── INIT ──────────────────────────────────────
-
-function init() {
-  const dateEl = document.getElementById('scheduleDate');
-  if (dateEl) dateEl.textContent = 'Today — ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-  // Enter key on admin password field
-  const passField = document.getElementById('adminPass');
-  if (passField) passField.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-
-  // Restore admin session
-  if (sessionStorage.getItem('vv_admin')) {
-    isAdmin = true;
-    document.getElementById('adminBadge').style.display = 'inline-block';
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-  }
-
-  setTimeout(requestNotificationPermission, 4000);
-
-  // Hide splash then hand off to auth
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hidden');
-    initSupabase();
-    initAuth(); // auth.js handles login screen vs app
-  }, 1800);
-}
-
-
-// ── EXPOSE CALENDAR GLOBALS ───────────────────
-window.calPrev = calPrev;
-window.calNext = calNext;
-window.setCalView = setCalView;
-window.renderCalendar = renderCalendar;
-window.showPortDetail = showPortDetail;
-window.closePortDetail = closePortDetail;
-window.selectSegment = selectSegment;
-window.renderSegmentFilter = renderSegmentFilter;
-window.renderPorts = renderPorts;
-window.buildPortIndex = buildPortIndex;
-window.initSegments = initSegments;
-
-// ── EXPOSE OTHER APP GLOBALS ──────────────────
-window.switchTab = switchTab;
-window.syncTopNav = syncTopNav;
-window.toggleForm = toggleForm;
-window.hideForm = hideForm;
-window.showToast = showToast;
-window.toggleAdminLogin = toggleAdminLogin;
-window.closeAdminModal = closeAdminModal;
-window.doLogin = doLogin;
 window.postUpdate = postUpdate;
 window.addEvent = addEvent;
 window.selectDay = selectDay;
@@ -1633,3 +1558,48 @@ function dismissInfoBanner() {
 window.sendInfoAlert = sendInfoAlert;
 window.showInfoBanner = showInfoBanner;
 window.dismissInfoBanner = dismissInfoBanner;
+
+// ── PDF UPLOADS IN UPDATES ────────────────────
+var _selectedPdfFile = null;
+var SUPABASE_URL_BASE = 'https://xqpvqztphkenokkjrzef.supabase.co';
+
+function handlePdfSelect(input) {
+  var file = input.files[0];
+  if (!file) return;
+  _selectedPdfFile = file;
+  var label = document.getElementById('pdfUploadLabel');
+  var area = document.getElementById('pdfUploadArea');
+  if (label) label.textContent = '📄 ' + file.name + ' (' + Math.round(file.size/1024) + 'KB)';
+  if (area) area.classList.add('pdf-selected');
+}
+
+function clearPdfUpload() {
+  _selectedPdfFile = null;
+  var input = document.getElementById('pdfFileInput');
+  if (input) input.value = '';
+  var label = document.getElementById('pdfUploadLabel');
+  var area = document.getElementById('pdfUploadArea');
+  if (label) label.textContent = 'Tap to attach a PDF';
+  if (area) area.classList.remove('pdf-selected');
+}
+
+async function uploadPdfToSupabase(file) {
+  if (!sbClient) return null;
+  var fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  try {
+    var { data, error } = await sbClient.storage
+      .from('update-pdfs')
+      .upload(fileName, file, { contentType: 'application/pdf', upsert: false });
+    if (error) throw error;
+    var { data: urlData } = sbClient.storage
+      .from('update-pdfs')
+      .getPublicUrl(fileName);
+    return { url: urlData.publicUrl, name: file.name };
+  } catch(e) {
+    console.error('PDF upload error:', e);
+    return null;
+  }
+}
+
+window.handlePdfSelect = handlePdfSelect;
+window.clearPdfUpload = clearPdfUpload;

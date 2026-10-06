@@ -1362,3 +1362,22 @@ main { flex: 1; overflow-y: auto; }
 .btn-info-alert:hover { background: #1344800; }
 .info-compose { background: #e8f2fa; border: 1px solid #93c5fd; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
 .info-compose-title { font-size: 16px; font-weight: 600; color: #1a56a0; margin-bottom: 6px; }
+
+/* ─── PDF UPLOAD & DISPLAY ─── */
+.pdf-upload-area {
+  border: 2px dashed var(--cream-dark); border-radius: 10px;
+  padding: 16px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--cream);
+}
+.pdf-upload-area:hover { border-color: var(--navy); background: var(--white); }
+.pdf-upload-area.pdf-selected { border-color: var(--success); background: var(--success-bg); }
+.pdf-upload-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+.pdf-upload-label { font-size: 13px; color: var(--text-mid); }
+.update-pdf-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 8px 14px;
+  background: var(--navy); color: var(--white);
+  border-radius: 8px; font-size: 13px; font-weight: 500;
+  text-decoration: none; transition: background 0.2s;
+}
+.update-pdf-btn:hover { background: var(--navy-mid); }
