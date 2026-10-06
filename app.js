@@ -1,135 +1,5 @@
 // ══════════════════════════════════════════════
 //  VILLA VIE RESIDENCES — app.js
-
-// ── SPA CART (must be defined before renderSpaMenu) ──────────────
-var spaCartItems = [];
-
-function handleSpaAdd(b) {
-  addToSpaCart(b.getAttribute('data-name'), b.getAttribute('data-duration'), b.getAttribute('data-price'));
-}
-
-function addToSpaCart(name, dur, price) {
-  if (spaCartItems.find(function(i) { return i.name === name; })) {
-    if (typeof showToast === 'function') showToast(name + ' already added');
-    return;
-  }
-  spaCartItems.push({ name: name, duration: dur, price: price });
-  updateSpaCartUI();
-  if (typeof showToast === 'function') showToast(name + ' added ✓');
-}
-
-function removeFromSpaCart(name) {
-  spaCartItems = spaCartItems.filter(function(i) { return i.name !== name; });
-  updateSpaCartUI();
-  renderSpaCartItems();
-  updateApptTreatmentList();
-}
-
-function spaRemoveClick(btn) {
-  removeFromSpaCart(btn.getAttribute('data-name'));
-}
-
-function updateSpaCartUI() {
-  var c = document.getElementById('spaCart');
-  var n = document.getElementById('spaCartCount');
-  if (c) c.style.display = spaCartItems.length ? 'flex' : 'none';
-  if (n) n.textContent = spaCartItems.length;
-  updateApptTreatmentList();
-  document.querySelectorAll('.spa-add-btn').forEach(function(b) {
-    var x = spaCartItems.find(function(i) { return i.name === b.getAttribute('data-name'); });
-    b.textContent = x ? '✓ Added' : '+ Add';
-    b.classList.toggle('btn-added', !!x);
-  });
-}
-
-function updateApptTreatmentList() {
-  var el = document.getElementById('apptTreatmentList');
-  if (!el) return;
-  el.innerHTML = spaCartItems.map(function(i) {
-    return '<div class="spa-selected-item"><span>' + i.name + (i.duration ? ' · ' + i.duration : '') + '</span>' +
-      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
-  }).join('');
-}
-
-function openSpaCart() {
-  var p = document.getElementById('spaCartPanel');
-  if (p) { p.style.display = 'block'; renderSpaCartItems(); p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-}
-
-function closeSpaCart() {
-  var p = document.getElementById('spaCartPanel');
-  if (p) p.style.display = 'none';
-}
-
-function renderSpaCartItems() {
-  var el = document.getElementById('spaCartItems');
-  if (!el) return;
-  if (!spaCartItems.length) {
-    el.innerHTML = '<div style="color:var(--text-light);font-size:14px;padding:8px 0">No treatments selected.</div>';
-    return;
-  }
-  el.innerHTML = spaCartItems.map(function(i) {
-    return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + i.name + '</div>' +
-      '<div class="spa-cart-item-detail">' + (i.duration || '') + (i.price ? ' · ' + i.price : '') + '</div></div>' +
-      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
-  }).join('');
-}
-
-function proceedToBook() {
-  closeSpaCart();
-  var s = document.getElementById('spaApptSection');
-  if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-window.handleSpaAdd = handleSpaAdd;
-window.addToSpaCart = addToSpaCart;
-window.removeFromSpaCart = removeFromSpaCart;
-window.spaRemoveClick = spaRemoveClick;
-window.updateSpaCartUI = updateSpaCartUI;
-window.openSpaCart = openSpaCart;
-window.closeSpaCart = closeSpaCart;
-window.proceedToBook = proceedToBook;
-// ─────────────────────────────────────────────────────────────────
-
-// ── UTILITY FUNCTIONS ────────────────────────
-function toggleForm(id) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
-}
-
-function hideForm(id) {
-  var el = document.getElementById(id);
-  if (el) el.style.display = 'none';
-}
-
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e3d2a;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none;';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function() { t.style.opacity = '0'; }, 3000);
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-window.toggleForm = toggleForm;
-window.hideForm = hideForm;
-window.showToast = showToast;
-window.escapeHtml = escapeHtml;
-// ─────────────────────────────────────────────
-
-
-
 // ══════════════════════════════════════════════
 
 // ── ADMIN CREDENTIALS ────────────────────────
@@ -364,9 +234,9 @@ function submitApptRequest() {
 // ── SAFETY DATA ───────────────────────────────
 const safetyData = [
   { icon: '🆘', title: 'Muster Stations & Life Jackets', open: true,
-    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 2–4: Muster Station A — Main Lounge, Deck 4</li><li>Decks 5–6: Muster Station B — Neptune Lounge, Deck 5</li><li>Decks 7–8: Muster Station C — Pool Deck, Deck 8</li></ul>` },
+    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 4–6: Muster Station A — Atrium, Level 4</li><li>Decks 7–9: Muster Station B — Grand Dining Room</li><li>Decks 10–12: Muster Station C — Sky Bar, Level 12</li></ul>` },
   { icon: '🔥', title: 'Fire Safety', open: false,
-    content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 8 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
+    content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 11 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
   { icon: '🏥', title: 'Medical Centre', open: false,
     content: `<p>The Medical Centre is on Deck 3 forward, staffed 24 hours.</p><ul><li>Emergency: extension 911</li><li>Non-emergency: extension 302</li><li>Walk-in hours: 8:00–10:00 AM and 5:00–7:00 PM</li></ul>` },
   { icon: '🌊', title: 'Man Overboard Procedure', open: false,
@@ -541,36 +411,403 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
+// ── SPA CART (must be defined before renderSpaMenu) ──────────────
+var spaCartItems = [];
 
-// ── SAFETY ADMIN ──────────────────────────────
-function addSafetyInfo() {
-  var title = document.getElementById('safetyTitle');
-  var body = document.getElementById('safetyBody');
-  var icon = document.getElementById('safetyIcon');
-  if (!title || !body) return;
-  var t = title.value.trim();
-  var b = body.value.trim();
-  if (!t || !b) { showToast('Please fill in title and content'); return; }
-  safetyData.push({ icon: (icon ? icon.value : '📋'), title: t, body: b });
-  renderSafety();
-  hideForm('addSafetyForm');
-  title.value = ''; body.value = '';
-  showToast('Safety info added ✓');
+function handleSpaAdd(b) {
+  addToSpaCart(b.getAttribute('data-name'), b.getAttribute('data-duration'), b.getAttribute('data-price'));
 }
-window.addSafetyInfo = addSafetyInfo;
 
-function toggleSafety(idx) {
-  var el = document.getElementById('safetyBody' + idx);
-  var icon = document.getElementById('safetyToggle' + idx);
+function addToSpaCart(name, dur, price) {
+  if (spaCartItems.find(function(i) { return i.name === name; })) {
+    if (typeof showToast === 'function') showToast(name + ' already added');
+    return;
+  }
+  spaCartItems.push({ name: name, duration: dur, price: price });
+  updateSpaCartUI();
+  if (typeof showToast === 'function') showToast(name + ' added ✓');
+}
+
+function removeFromSpaCart(name) {
+  spaCartItems = spaCartItems.filter(function(i) { return i.name !== name; });
+  updateSpaCartUI();
+  renderSpaCartItems();
+  updateApptTreatmentList();
+}
+
+function spaRemoveClick(btn) {
+  removeFromSpaCart(btn.getAttribute('data-name'));
+}
+
+function updateSpaCartUI() {
+  var c = document.getElementById('spaCart');
+  var n = document.getElementById('spaCartCount');
+  if (c) c.style.display = spaCartItems.length ? 'flex' : 'none';
+  if (n) n.textContent = spaCartItems.length;
+  updateApptTreatmentList();
+  document.querySelectorAll('.spa-add-btn').forEach(function(b) {
+    var x = spaCartItems.find(function(i) { return i.name === b.getAttribute('data-name'); });
+    b.textContent = x ? '✓ Added' : '+ Add';
+    b.classList.toggle('btn-added', !!x);
+  });
+}
+
+function updateApptTreatmentList() {
+  var el = document.getElementById('apptTreatmentList');
   if (!el) return;
-  var open = el.style.display !== 'none' && el.style.display !== '';
-  el.style.display = open ? 'none' : 'block';
-  if (icon) icon.textContent = open ? '▼' : '▲';
+  el.innerHTML = spaCartItems.map(function(i) {
+    return '<div class="spa-selected-item"><span>' + i.name + (i.duration ? ' · ' + i.duration : '') + '</span>' +
+      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
+  }).join('');
 }
-window.toggleSafety = toggleSafety;
-// ─────────────────────────────────────────────
 
-window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
+function openSpaCart() {
+  var p = document.getElementById('spaCartPanel');
+  if (p) { p.style.display = 'block'; renderSpaCartItems(); p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+function closeSpaCart() {
+  var p = document.getElementById('spaCartPanel');
+  if (p) p.style.display = 'none';
+}
+
+function renderSpaCartItems() {
+  var el = document.getElementById('spaCartItems');
+  if (!el) return;
+  if (!spaCartItems.length) {
+    el.innerHTML = '<div style="color:var(--text-light);font-size:14px;padding:8px 0">No treatments selected.</div>';
+    return;
+  }
+  el.innerHTML = spaCartItems.map(function(i) {
+    return '<div class="spa-cart-item"><div><div class="spa-cart-item-name">' + i.name + '</div>' +
+      '<div class="spa-cart-item-detail">' + (i.duration || '') + (i.price ? ' · ' + i.price : '') + '</div></div>' +
+      '<button class="spa-remove-btn" data-name="' + i.name.replace(/"/g, '&quot;') + '" onclick="spaRemoveClick(this)">✕</button></div>';
+  }).join('');
+}
+
+function proceedToBook() {
+  closeSpaCart();
+  var s = document.getElementById('spaApptSection');
+  if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+window.handleSpaAdd = handleSpaAdd;
+window.addToSpaCart = addToSpaCart;
+window.removeFromSpaCart = removeFromSpaCart;
+window.spaRemoveClick = spaRemoveClick;
+window.updateSpaCartUI = updateSpaCartUI;
+window.openSpaCart = openSpaCart;
+window.closeSpaCart = closeSpaCart;
+window.proceedToBook = proceedToBook;
+// ─────────────────────────────────────────────────────────────────
+
+
+// ── DYNAMIC DAY NAV ──────────────────────────
+function initDayNav() {
+  var container = document.getElementById('dayNavContainer');
+  if (!container) return;
+
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var today = new Date();
+  var html = '';
+
+  for (var i = 0; i < 5; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
+    var activeClass = i === 0 ? ' active' : '';
+    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
+  }
+  container.innerHTML = html;
+
+  // Also update scheduleDate
+  var dateEl = document.getElementById('scheduleDate');
+  if (dateEl) {
+    dateEl.textContent = 'Today — ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+}
+window.initDayNav = initDayNav;
+
+
+// ── INFO BANNER ──────────────────────────────
+function sendInfoAlert() {
+  var title = document.getElementById('infoAlertTitle').value.trim();
+  var body = document.getElementById('infoAlertBody').value.trim();
+  if (!title || !body) { showToast('Please fill in title and message'); return; }
+  showInfoBanner(title, body);
+  hideForm('infoComposeForm');
+  document.getElementById('infoAlertTitle').value = '';
+  document.getElementById('infoAlertBody').value = '';
+  showToast('Ship notice posted ✓');
+}
+
+function showInfoBanner(title, body) {
+  var banner = document.getElementById('infoBanner');
+  var t = document.getElementById('infoBannerTitle');
+  var b = document.getElementById('infoBannerBody');
+  var time = document.getElementById('infoBannerTime');
+  if (!banner) return;
+  if (t) t.textContent = title;
+  if (b) b.textContent = body;
+  if (time) time.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  banner.classList.add('show');
+  banner.style.display = 'block';
+}
+
+function dismissInfoBanner() {
+  var banner = document.getElementById('infoBanner');
+  if (banner) { banner.classList.remove('show'); banner.style.display = 'none'; }
+}
+
+window.sendInfoAlert = sendInfoAlert;
+window.showInfoBanner = showInfoBanner;
+window.dismissInfoBanner = dismissInfoBanner;
+
+
+// ── PDF UPLOADS IN UPDATES ────────────────────
+var _selectedPdfFile = null;
+var SUPABASE_URL_BASE = 'https://xqpvqztphkenokkjrzef.supabase.co';
+
+function handlePdfSelect(input) {
+  var file = input.files[0];
+  if (!file) return;
+  _selectedPdfFile = file;
+  var label = document.getElementById('pdfUploadLabel');
+  var area = document.getElementById('pdfUploadArea');
+  if (label) label.textContent = '📄 ' + file.name + ' (' + Math.round(file.size/1024) + 'KB)';
+  if (area) area.classList.add('pdf-selected');
+}
+
+function clearPdfUpload() {
+  _selectedPdfFile = null;
+  var input = document.getElementById('pdfFileInput');
+  if (input) input.value = '';
+  var label = document.getElementById('pdfUploadLabel');
+  var area = document.getElementById('pdfUploadArea');
+  if (label) label.textContent = 'Tap to attach a PDF';
+  if (area) area.classList.remove('pdf-selected');
+}
+
+async function uploadPdfToSupabase(file) {
+  if (!sbClient) return null;
+  var fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  try {
+    var { data, error } = await sbClient.storage
+      .from('update-pdfs')
+      .upload(fileName, file, { contentType: 'application/pdf', upsert: false });
+    if (error) throw error;
+    var { data: urlData } = sbClient.storage
+      .from('update-pdfs')
+      .getPublicUrl(fileName);
+    return { url: urlData.publicUrl, name: file.name };
+  } catch(e) {
+    console.error('PDF upload error:', e);
+    return null;
+  }
+}
+
+window.handlePdfSelect = handlePdfSelect;
+window.clearPdfUpload = clearPdfUpload;
+
+
+// ══════════════════════════════════════════════
+//  COMMUNITY GROUPS
+// ══════════════════════════════════════════════
+
+var accessLevelOrder = { 'renter': 0, 'resident': 1, 'founder': 2, 'team': 3 };
+var groupsData = [];
+var groupMemberships = [];
+
+async function loadGroups() {
+  if (!sbClient) return;
+  var userLevel = window.accessLevel || 'resident';
+  var userRank = accessLevelOrder[userLevel] || 0;
+
+  try {
+    var { data: groups, error } = await sbClient
+      .from('groups')
+      .select('*, group_members(user_email)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    groupsData = groups || [];
+
+    // Get current user memberships
+    var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+    var { data: memberships } = await sbClient
+      .from('group_members')
+      .select('group_id')
+      .eq('user_email', userEmail);
+    groupMemberships = (memberships || []).map(function(m) { return m.group_id; });
+
+    renderGroups(userRank, userEmail);
+  } catch(e) {
+    console.error('loadGroups error:', e);
+    var el = document.getElementById('groupsList');
+    if (el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">Could not load groups.</div>';
+  }
+}
+
+function renderGroups(userRank, userEmail) {
+  var el = document.getElementById('groupsList');
+  var subtitle = document.getElementById('groupsSubtitle');
+  if (!el) return;
+
+  // Filter groups by access level
+  var visible = groupsData.filter(function(g) {
+    var groupRank = accessLevelOrder[g.min_access_level] || 0;
+    return userRank >= groupRank;
+  });
+
+  if (subtitle) subtitle.textContent = visible.length + ' group' + (visible.length !== 1 ? 's' : '') + ' available to you';
+
+  if (!visible.length) {
+    el.innerHTML = '<div class="groups-empty"><div style="font-size:40px;margin-bottom:12px">&#128101;</div><div style="font-size:16px;font-weight:500;color:var(--navy)">No groups yet</div><div style="font-size:13px;color:var(--text-light);margin-top:6px">Be the first to create a community group</div></div>';
+    return;
+  }
+
+  var levelLabels = { renter: 'Everyone', resident: 'Residents & Founders', founder: 'Founders only', team: 'Team only' };
+
+  el.innerHTML = visible.map(function(g) {
+    var memberCount = (g.group_members || []).length;
+    var isMember = groupMemberships.indexOf(g.group_id || g.id) > -1 || 
+                   (g.group_members || []).some(function(m) { return m.user_email === userEmail; });
+    var isOwner = g.created_by === userEmail;
+    var isAdmin = typeof window.isAdmin !== 'undefined' && window.isAdmin;
+    var levelLabel = levelLabels[g.min_access_level] || g.min_access_level;
+
+    return '<div class="group-card">' +
+      '<div class="group-card-body">' +
+        '<div class="group-card-header">' +
+          '<div class="group-name">' + escapeHtml(g.name) + '</div>' +
+          (g.min_access_level !== 'renter' ?
+            '<span class="group-level-badge">' + levelLabel + '</span>' : '') +
+        '</div>' +
+        '<div class="group-desc">' + escapeHtml(g.description || '') + '</div>' +
+        '<div class="group-meta">' +
+          '<span class="group-member-count">&#128101; ' + memberCount + ' member' + (memberCount !== 1 ? 's' : '') + '</span>' +
+          '<span class="group-creator">Created by ' + escapeHtml(g.created_by_name || g.created_by || 'resident') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="group-card-actions">' +
+        (isMember ?
+          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\"' + g.id + '\")">&#10003; Joined</button>' :
+          '<button class="btn-gold btn-sm" onclick="joinGroup(\"' + g.id + '\")">Join</button>') +
+        ((isOwner || isAdmin) ?
+          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\"' + g.id + '\")">&#128465;</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function createGroup() {
+  var name = document.getElementById('groupName').value.trim();
+  var desc = document.getElementById('groupDesc').value.trim();
+  var level = document.getElementById('groupLevel').value;
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
+    currentUser.user_metadata.full_name || userEmail : userEmail;
+
+  if (!name || !desc) { showToast('Please fill in name and description'); return; }
+  if (!sbClient) { showToast('Not connected'); return; }
+
+  try {
+    var { error } = await sbClient.from('groups').insert({
+      name: name, description: desc,
+      min_access_level: level,
+      created_by: userEmail,
+      created_by_name: userName
+    });
+    if (error) throw error;
+    hideForm('createGroupForm');
+    document.getElementById('groupName').value = '';
+    document.getElementById('groupDesc').value = '';
+    showToast('Group created ✓');
+    loadGroups();
+  } catch(e) {
+    console.error('createGroup error:', e);
+    showToast('Error creating group');
+  }
+}
+
+async function joinGroup(groupId) {
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
+    currentUser.user_metadata.full_name || userEmail : userEmail;
+  if (!userEmail) { showToast('Please log in to join groups'); return; }
+  try {
+    var { error } = await sbClient.from('group_members').insert({
+      group_id: groupId, user_email: userEmail, user_name: userName
+    });
+    if (error && error.code !== '23505') throw error;
+    showToast('Joined group ✓');
+    loadGroups();
+  } catch(e) { showToast('Error joining group'); }
+}
+
+async function leaveGroup(groupId) {
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  try {
+    await sbClient.from('group_members').delete()
+      .eq('group_id', groupId).eq('user_email', userEmail);
+    showToast('Left group');
+    loadGroups();
+  } catch(e) { showToast('Error leaving group'); }
+}
+
+async function deleteGroup(groupId) {
+  if (!confirm('Delete this group? This cannot be undone.')) return;
+  try {
+    await sbClient.from('groups').delete().eq('id', groupId);
+    showToast('Group deleted');
+    loadGroups();
+  } catch(e) { showToast('Error deleting group'); }
+}
+
+window.loadGroups = loadGroups;
+window.createGroup = createGroup;
+window.joinGroup = joinGroup;
+window.leaveGroup = leaveGroup;
+window.deleteGroup = deleteGroup;
+
+// ── DYNAMIC DAY NAV ──────────────────────────
+function initDayNav() {
+  var container = document.getElementById('dayNavContainer');
+  if (!container) return;
+
+  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var today = new Date();
+  var html = '';
+
+  for (var i = 0; i < 5; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
+    var activeClass = i === 0 ? ' active' : '';
+    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
+  }
+  container.innerHTML = html;
+
+  // Also update scheduleDate
+  var dateEl = document.getElementById('scheduleDate');
+  if (dateEl) {
+    dateEl.textContent = 'Today — ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+}
+window.initDayNav = initDayNav;
+
+// ── INFO BANNER ──────────────────────────────
+function sendInfoAlert() {
+  var title = document.getElementById('infoAlertTitle').value.trim();
+  var body = document.getElementById('infoAlertBody').value.trim();
+  if (!title || !body) { showToast('Please fill in title and message'); return; }
+  showInfoBanner(title, body);
+  hideForm('infoComposeForm');
+  document.getElementById('infoAlertTitle').value = '';
+  document.getElementById('infoAlertBody').value = '';
+  show
+
+window.addEventListener('DOMContentLoaded', init);
 
 // ══════════════════════════════════════════════
 //  POLLS
@@ -731,7 +968,6 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
 
 // ══════════════════════════════════════════════
 //  POLLS
@@ -745,7 +981,6 @@ function switchTab(id, tab) {
   if (tab) tab.classList.add('active');
   if (id === 'updates') document.getElementById('updatesBadge').classList.remove('show');
   if (id === 'groups') { if (typeof loadGroups === 'function') loadGroups(); }
-  if (id === 'schedule') { if (typeof initDayNav === 'function') initDayNav(); }
   if (id === 'chat') {
     document.getElementById('chatBadge')?.classList.remove('show');
     if (typeof onChatTabOpen === 'function') onChatTabOpen();
@@ -876,46 +1111,121 @@ function addEvent() {
 // ── ADMIN — UPDATES ───────────────────────────
 
 async function postUpdate() {
-  var title = (document.getElementById('newUpdateTitle') || document.getElementById('updateTitle'));
-  var body = document.getElementById('newUpdateBody');
-  var cat = document.getElementById('newUpdateCat');
-  
-  if (!title || !body) return;
-  var t = title.value.trim();
-  var b = body.value.trim();
-  if (!t || !b) { showToast('Please fill in title and message'); return; }
-  
-  var btn = document.getElementById('postUpdateBtn');
-  if (btn) { btn.textContent = 'Posting...'; btn.disabled = true; }
-  
-  var pdfUrl = null, pdfName = null;
-  if (_selectedPdfFile) {
-    if (btn) btn.textContent = 'Uploading PDF...';
-    var pdfResult = await uploadPdfToSupabase(_selectedPdfFile);
-    if (pdfResult) { pdfUrl = pdfResult.url; pdfName = pdfResult.name; }
-    else { showToast('PDF upload failed — posting without attachment'); }
-  }
-  
-  try {
-    var { error } = await sbClient.from('updates').insert({
-      title: t, body: b,
-      category: cat ? cat.value : 'general',
-      pdf_url: pdfUrl, pdf_name: pdfName
-    });
-    if (error) throw error;
-    hideForm('addUpdateForm');
-    title.value = ''; body.value = '';
-    if (cat) cat.value = 'general';
-    clearPdfUpload();
-    if (btn) { btn.textContent = 'Post Update'; btn.disabled = false; }
-    showToast('Update posted ✓');
-    loadUpdates();
-  } catch(e) {
-    console.error('postUpdate error:', e);
-    if (btn) { btn.textContent = 'Post Update'; btn.disabled = false; }
-    showToast('Error posting update');
+  const title = document.getElementById('newUpdateTitle').value.trim();
+  const body = document.getElementById('newUpdateBody').value.trim();
+  const cat = document.getElementById('newUpdateCat').value;
+  const notif = document.getElementById('newUpdateNotif').value;
+  if (!title || !body) { showToast('Please fill in all fields'); return; }
+  showToast('Posting…');
+  const ok = await postUpdateToDb(title, body, cat);
+  if (!ok) return;
+  hideForm('addUpdateForm');
+  document.getElementById('newUpdateTitle').value = '';
+  document.getElementById('newUpdateBody').value = '';
+  if (notif === 'yes') showNotification(`📢 ${title}`);
+  showToast('Update posted ✓');
+}
+
+// ── ADMIN — SAFETY ─────────────────────────────
+
+function addSafetyInfo() {
+  const title = document.getElementById('safetyTitle').value.trim();
+  const body = document.getElementById('safetyBody').value.trim();
+  if (!title || !body) { showToast('Please fill in all fields'); return; }
+  safetyData.push({ icon: '📋', title, open: false, content: `<p>${body.replace(/\n/g, '</p><p>')}</p>` });
+  renderSafety();
+  hideForm('addSafetyForm');
+  document.getElementById('safetyTitle').value = '';
+  document.getElementById('safetyBody').value = '';
+  showToast('Safety info added ✓');
+}
+
+// ── NOTIFICATIONS ─────────────────────────────
+
+function showNotification(message) {
+  const banner = document.getElementById('notifBanner');
+  document.getElementById('notifText').textContent = message;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 6000);
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Villa Vie Residences', { body: message, icon: 'icons/icon-192.png' });
   }
 }
+
+function dismissNotif() { document.getElementById('notifBanner').classList.remove('show'); }
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => { if (p === 'granted') showToast('Notifications enabled ✓'); });
+  }
+}
+
+// ── HELPERS ───────────────────────────────────
+
+function toggleForm(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function hideForm(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ──────────────────────────────────────
+
+function init() {
+  const dateEl = document.getElementById('scheduleDate');
+  if (dateEl) dateEl.textContent = 'Today — ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Enter key on admin password field
+  const passField = document.getElementById('adminPass');
+  if (passField) passField.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // Restore admin session
+  if (sessionStorage.getItem('vv_admin')) {
+    isAdmin = true;
+    document.getElementById('adminBadge').style.display = 'inline-block';
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+  }
+
+  setTimeout(requestNotificationPermission, 4000);
+
+  // Hide splash then hand off to auth
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hidden');
+    initSupabase();
+    initAuth(); // auth.js handles login screen vs app
+  }, 1800);
+}
+
+
+// ── EXPOSE CALENDAR GLOBALS ───────────────────
+window.calPrev = calPrev;
+window.calNext = calNext;
+window.setCalView = setCalView;
+window.renderCalendar = renderCalendar;
+window.showPortDetail = showPortDetail;
+window.closePortDetail = closePortDetail;
+window.selectSegment = selectSegment;
+window.renderSegmentFilter = renderSegmentFilter;
+window.renderPorts = renderPorts;
+window.buildPortIndex = buildPortIndex;
+window.initSegments = initSegments;
+
+// ── EXPOSE OTHER APP GLOBALS ──────────────────
+window.switchTab = switchTab;
+window.syncTopNav = syncTopNav;
+window.toggleForm = toggleForm;
+window.hideForm = hideForm;
+window.showToast = showToast;
+window.toggleAdminLogin = toggleAdminLogin;
+window.closeAdminModal = closeAdminModal;
+window.doLogin = doLogin;
 window.postUpdate = postUpdate;
 window.addEvent = addEvent;
 window.selectDay = selectDay;
@@ -947,7 +1257,6 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
-window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
 
 // SUB-TAB SWITCHER
 function switchSubTab(contentId, btnId) {
@@ -1566,108 +1875,4 @@ window.createGroup = createGroup;
 window.joinGroup = joinGroup;
 window.leaveGroup = leaveGroup;
 window.deleteGroup = deleteGroup;
-
-// ── DYNAMIC DAY NAV ──────────────────────────
-function initDayNav() {
-  var container = document.getElementById('dayNavContainer');
-  if (!container) return;
-
-  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  var today = new Date();
-  var html = '';
-
-  for (var i = 0; i < 5; i++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + i);
-    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
-    var activeClass = i === 0 ? ' active' : '';
-    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
-  }
-  container.innerHTML = html;
-
-  // Also update scheduleDate
-  var dateEl = document.getElementById('scheduleDate');
-  if (dateEl) {
-    dateEl.textContent = 'Today — ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  }
 }
-window.initDayNav = initDayNav;
-
-// ── INFO BANNER ──────────────────────────────
-function sendInfoAlert() {
-  var title = document.getElementById('infoAlertTitle').value.trim();
-  var body = document.getElementById('infoAlertBody').value.trim();
-  if (!title || !body) { showToast('Please fill in title and message'); return; }
-  showInfoBanner(title, body);
-  hideForm('infoComposeForm');
-  document.getElementById('infoAlertTitle').value = '';
-  document.getElementById('infoAlertBody').value = '';
-  showToast('Ship notice posted ✓');
-}
-
-function showInfoBanner(title, body) {
-  var banner = document.getElementById('infoBanner');
-  var t = document.getElementById('infoBannerTitle');
-  var b = document.getElementById('infoBannerBody');
-  var time = document.getElementById('infoBannerTime');
-  if (!banner) return;
-  if (t) t.textContent = title;
-  if (b) b.textContent = body;
-  if (time) time.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-  banner.classList.add('show');
-  banner.style.display = 'block';
-}
-
-function dismissInfoBanner() {
-  var banner = document.getElementById('infoBanner');
-  if (banner) { banner.classList.remove('show'); banner.style.display = 'none'; }
-}
-
-window.sendInfoAlert = sendInfoAlert;
-window.showInfoBanner = showInfoBanner;
-window.dismissInfoBanner = dismissInfoBanner;
-
-// ── PDF UPLOADS IN UPDATES ────────────────────
-var _selectedPdfFile = null;
-var SUPABASE_URL_BASE = 'https://xqpvqztphkenokkjrzef.supabase.co';
-
-function handlePdfSelect(input) {
-  var file = input.files[0];
-  if (!file) return;
-  _selectedPdfFile = file;
-  var label = document.getElementById('pdfUploadLabel');
-  var area = document.getElementById('pdfUploadArea');
-  if (label) label.textContent = '📄 ' + file.name + ' (' + Math.round(file.size/1024) + 'KB)';
-  if (area) area.classList.add('pdf-selected');
-}
-
-function clearPdfUpload() {
-  _selectedPdfFile = null;
-  var input = document.getElementById('pdfFileInput');
-  if (input) input.value = '';
-  var label = document.getElementById('pdfUploadLabel');
-  var area = document.getElementById('pdfUploadArea');
-  if (label) label.textContent = 'Tap to attach a PDF';
-  if (area) area.classList.remove('pdf-selected');
-}
-
-async function uploadPdfToSupabase(file) {
-  if (!sbClient) return null;
-  var fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  try {
-    var { data, error } = await sbClient.storage
-      .from('update-pdfs')
-      .upload(fileName, file, { contentType: 'application/pdf', upsert: false });
-    if (error) throw error;
-    var { data: urlData } = sbClient.storage
-      .from('update-pdfs')
-      .getPublicUrl(fileName);
-    return { url: urlData.publicUrl, name: file.name };
-  } catch(e) {
-    console.error('PDF upload error:', e);
-    return null;
-  }
-}
-
-window.handlePdfSelect = handlePdfSelect;
-window.clearPdfUpload = clearPdfUpload;
