@@ -541,6 +541,35 @@ function renderSchedule(dayIndex) {
 }
 window.renderSchedule = renderSchedule;
 
+
+// ── SAFETY ADMIN ──────────────────────────────
+function addSafetyInfo() {
+  var title = document.getElementById('safetyTitle');
+  var body = document.getElementById('safetyBody');
+  var icon = document.getElementById('safetyIcon');
+  if (!title || !body) return;
+  var t = title.value.trim();
+  var b = body.value.trim();
+  if (!t || !b) { showToast('Please fill in title and content'); return; }
+  safetyData.push({ icon: (icon ? icon.value : '📋'), title: t, body: b });
+  renderSafety();
+  hideForm('addSafetyForm');
+  title.value = ''; body.value = '';
+  showToast('Safety info added ✓');
+}
+window.addSafetyInfo = addSafetyInfo;
+
+function toggleSafety(idx) {
+  var el = document.getElementById('safetyBody' + idx);
+  var icon = document.getElementById('safetyToggle' + idx);
+  if (!el) return;
+  var open = el.style.display !== 'none' && el.style.display !== '';
+  el.style.display = open ? 'none' : 'block';
+  if (icon) icon.textContent = open ? '▼' : '▲';
+}
+window.toggleSafety = toggleSafety;
+// ─────────────────────────────────────────────
+
 window.addEventListener('DOMContentLoaded', function() { init(); setTimeout(initDayNav, 500); });
 
 // ══════════════════════════════════════════════
