@@ -749,30 +749,6 @@ window.leaveGroup = leaveGroup;
 window.deleteGroup = deleteGroup;
 
 // ── DYNAMIC DAY NAV ──────────────────────────
-function initDayNav() {
-  var container = document.getElementById('dayNavContainer');
-  if (!container) return;
-
-  var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  var today = new Date();
-  var html = '';
-
-  for (var i = 0; i < 5; i++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + i);
-    var label = i === 0 ? 'Today' : days[d.getDay()] + ' ' + d.getDate();
-    var activeClass = i === 0 ? ' active' : '';
-    html += '<button class="day-btn' + activeClass + '" id="dayBtn' + i + '" onclick="selectDay(' + i + ',this)">' + label + '</button>';
-  }
-  container.innerHTML = html;
-
-  // Also update scheduleDate
-  var dateEl = document.getElementById('scheduleDate');
-  if (dateEl) {
-    dateEl.textContent = 'Today — ' + today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  }
-}
-window.initDayNav = initDayNav;
 
 // ── INFO BANNER ──────────────────────────────
 function sendInfoAlert() {
