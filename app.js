@@ -91,6 +91,45 @@ window.closeSpaCart = closeSpaCart;
 window.proceedToBook = proceedToBook;
 // ─────────────────────────────────────────────────────────────────
 
+// ── UTILITY FUNCTIONS ────────────────────────
+function toggleForm(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+}
+
+function hideForm(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e3d2a;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.style.opacity = '0'; }, 3000);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+window.toggleForm = toggleForm;
+window.hideForm = hideForm;
+window.showToast = showToast;
+window.escapeHtml = escapeHtml;
+// ─────────────────────────────────────────────
+
+
+
 // ══════════════════════════════════════════════
 
 // ── ADMIN CREDENTIALS ────────────────────────
