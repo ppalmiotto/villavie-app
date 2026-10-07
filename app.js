@@ -212,6 +212,102 @@ function renderSpaMenu() {
   updateSpaCartUI();
 }
 
+// ── SPA CART ─────────────────────────────────
+var spaCart = [];
+
+function handleSpaAdd(btn) {
+  var name = btn.getAttribute('data-name');
+  var duration = btn.getAttribute('data-duration');
+  var price = btn.getAttribute('data-price');
+  var existing = spaCart.findIndex(function(i) { return i.name === name; });
+  if (existing >= 0) {
+    showToast(name + ' already in your selection');
+    return;
+  }
+  spaCart.push({ name: name, duration: duration, price: price });
+  btn.textContent = 'Added';
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  updateSpaCartUI();
+  showToast(name + ' added to selection');
+}
+
+function updateSpaCartUI() {
+  var countEl = document.getElementById('spaCartCount');
+  var cartEl = document.getElementById('spaCart');
+  var itemsEl = document.getElementById('spaCartItems');
+  var apptList = document.getElementById('apptTreatmentList');
+
+  var count = spaCart.length;
+  if (countEl) countEl.textContent = count;
+  if (cartEl) cartEl.style.display = count > 0 ? 'flex' : 'none';
+
+  if (itemsEl) {
+    if (count === 0) {
+      itemsEl.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-light)">No treatments selected yet</div>';
+    } else {
+      itemsEl.innerHTML = spaCart.map(function(item, idx) {
+        return '<div class="spa-cart-item" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">' +
+          '<div><div style="font-weight:600">' + item.name + '</div>' +
+          '<div style="font-size:12px;color:var(--text-light)">' + item.duration + ' &bull; ' + item.price + '</div></div>' +
+          '<button onclick="spaRemoveClick(' + idx + ')" style="background:none;border:none;color:var(--text-light);font-size:18px;cursor:pointer;padding:4px 8px">&times;</button>' +
+          '</div>';
+      }).join('');
+    }
+  }
+
+  if (apptList) {
+    if (count === 0) {
+      apptList.innerHTML = '<div style="color:var(--text-light);font-size:13px">No treatments selected</div>';
+    } else {
+      apptList.innerHTML = spaCart.map(function(item) {
+        return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:14px">' + item.name + ' &mdash; ' + item.duration + '</div>';
+      }).join('');
+    }
+  }
+}
+
+function spaRemoveClick(idx) {
+  var removed = spaCart.splice(idx, 1)[0];
+  // Re-enable the Add button for this treatment
+  document.querySelectorAll('.spa-add-btn').forEach(function(btn) {
+    if (btn.getAttribute('data-name') === removed.name) {
+      btn.textContent = '+ Add';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  });
+  updateSpaCartUI();
+  if (spaCart.length === 0) closeSpaCart();
+}
+
+function openSpaCart() {
+  var panel = document.getElementById('spaCartPanel');
+  if (panel) panel.style.display = 'block';
+  updateSpaCartUI();
+}
+
+function closeSpaCart() {
+  var panel = document.getElementById('spaCartPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function proceedToBook() {
+  closeSpaCart();
+  var apptSection = document.getElementById('spaApptSection');
+  if (apptSection) apptSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  updateSpaCartUI();
+}
+
+window.handleSpaAdd = handleSpaAdd;
+window.updateSpaCartUI = updateSpaCartUI;
+window.spaRemoveClick = spaRemoveClick;
+window.openSpaCart = openSpaCart;
+window.closeSpaCart = closeSpaCart;
+window.proceedToBook = proceedToBook;
+
+// ─────────────────────────────────────────────
+
 function addTreatment() {
   const name = document.getElementById('txName').value.trim();
   const cat = document.getElementById('txCat').value;
