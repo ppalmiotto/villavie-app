@@ -1784,9 +1784,13 @@ window.sendInfoAlert = sendInfoAlert;
 window.showInfoBanner = showInfoBanner;
 window.dismissInfoBanner = dismissInfoBanner;
 
-// ── PDF UPLOADS IN UPDATES ────────────────────
+window.handlePdfSelect = handlePdfSelect;
+window.clearPdfUpload = clearPdfUpload;
+
+}
+
+// ── PDF UPLOADS IN UPDATES (global scope) ─────
 var _selectedPdfFile = null;
-var SUPABASE_URL_BASE = 'https://xqpvqztphkenokkjrzef.supabase.co';
 
 function handlePdfSelect(input) {
   var file = input.files[0];
@@ -1809,14 +1813,14 @@ function clearPdfUpload() {
 }
 
 async function uploadPdfToSupabase(file) {
-  if (!sbClient) return null;
+  if (!window.sbClient) return null;
   var fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   try {
-    var { data, error } = await sbClient.storage
+    var { data, error } = await window.sbClient.storage
       .from('update-pdfs')
       .upload(fileName, file, { contentType: 'application/pdf', upsert: false });
     if (error) throw error;
-    var { data: urlData } = sbClient.storage
+    var { data: urlData } = window.sbClient.storage
       .from('update-pdfs')
       .getPublicUrl(fileName);
     return { url: urlData.publicUrl, name: file.name };
@@ -1824,11 +1828,6 @@ async function uploadPdfToSupabase(file) {
     console.error('PDF upload error:', e);
     return null;
   }
-}
-
-window.handlePdfSelect = handlePdfSelect;
-window.clearPdfUpload = clearPdfUpload;
-
 }
 
 window.addEventListener('DOMContentLoaded', init);
