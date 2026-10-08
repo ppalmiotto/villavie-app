@@ -486,6 +486,7 @@ main { flex: 1; overflow-y: auto; }
 .update-time { font-size: 11px; color: var(--text-light); margin-left: auto; }
 .update-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: var(--navy); margin-bottom: 6px; }
 .update-body { font-size: 14px; line-height: 1.6; color: var(--text-mid); }
+.update-pdf-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 8px 14px; background: var(--cream); border: 1px solid var(--cream-dark); border-radius: 20px; font-size: 13px; color: var(--navy); text-decoration: none; font-weight: 500; }
 
 /* ─── PHOTOS ─── */
 .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
