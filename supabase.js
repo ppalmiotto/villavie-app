@@ -118,6 +118,8 @@ async function loadUpdates() {
       category: row.category,
       title: row.title,
       body: row.body,
+      pdf_url: row.pdf_url || null,
+      pdf_name: row.pdf_name || null,
       time: new Date(row.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     });
   });
@@ -136,11 +138,13 @@ function subscribeToUpdates() {
     .subscribe();
 }
 
-async function postUpdateToDb(title, body, category) {
+async function postUpdateToDb(title, body, category, pdf_url, pdf_name) {
   if (!sbClient) { showToast('Database not connected'); return false; }
+  const record = { title, body, category };
+  if (pdf_url) { record.pdf_url = pdf_url; record.pdf_name = pdf_name || 'attachment.pdf'; }
   const { error } = await sbClient
     .from('updates')
-    .insert([{ title, body, category }]);
+    .insert([record]);
   if (error) { console.error('Error posting update:', error); showToast('Error posting update'); return false; }
   return true;
 }
