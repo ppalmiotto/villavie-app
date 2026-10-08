@@ -342,8 +342,6 @@ function submitApptRequest() {
 
 // ── SAFETY DATA ───────────────────────────────
 const safetyData = [
-  { icon: '🆘', title: 'Muster Stations & Life Jackets', open: true,
-    content: `<p>Your muster station is shown on the back of your stateroom door. Life jackets are stored in the overhead compartment above your bed.</p><p><strong>Muster Stations by Deck:</strong></p><ul><li>Decks 4-6: Muster Station A -- Atrium, Level 4</li><li>Decks 7-9: Muster Station B -- Grand Dining Room</li><li>Decks 10-12: Muster Station C -- Sky Bar, Level 12</li></ul>` },
   { icon: '🔥', title: 'Fire Safety', open: false,
     content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 11 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
   { icon: '🏥', title: 'Medical Centre', open: false,
