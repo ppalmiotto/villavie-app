@@ -827,8 +827,16 @@ async function postUpdate() {
   const notif = document.getElementById('newUpdateNotif').value;
   if (!title || !body) { showToast('Please fill in all fields'); return; }
   showToast('Posting...');
-  const ok = await postUpdateToDb(title, body, cat);
+  let pdfUrl = null, pdfName = null;
+  if (_selectedPdfFile) {
+    showToast('Uploading PDF...');
+    const result = await uploadPdfToSupabase(_selectedPdfFile);
+    if (!result) { showToast('PDF upload failed — posting without attachment'); }
+    else { pdfUrl = result.url; pdfName = result.name; }
+  }
+  const ok = await postUpdateToDb(title, body, cat, pdfUrl, pdfName);
   if (!ok) return;
+  clearPdfUpload();
   hideForm('addUpdateForm');
   document.getElementById('newUpdateTitle').value = '';
   document.getElementById('newUpdateBody').value = '';
@@ -1449,8 +1457,16 @@ async function postUpdate() {
   const notif = document.getElementById('newUpdateNotif').value;
   if (!title || !body) { showToast('Please fill in all fields'); return; }
   showToast('Posting...');
-  const ok = await postUpdateToDb(title, body, cat);
+  let pdfUrl = null, pdfName = null;
+  if (_selectedPdfFile) {
+    showToast('Uploading PDF...');
+    const result = await uploadPdfToSupabase(_selectedPdfFile);
+    if (!result) { showToast('PDF upload failed — posting without attachment'); }
+    else { pdfUrl = result.url; pdfName = result.name; }
+  }
+  const ok = await postUpdateToDb(title, body, cat, pdfUrl, pdfName);
   if (!ok) return;
+  clearPdfUpload();
   hideForm('addUpdateForm');
   document.getElementById('newUpdateTitle').value = '';
   document.getElementById('newUpdateBody').value = '';
@@ -2019,6 +2035,7 @@ function renderUpdates() {
       </div>
       <div class="update-title">${u.title}</div>
       <div class="update-body">${u.body}</div>
+      ${u.pdf_url ? `<a class="update-pdf-link" href="${u.pdf_url}" target="_blank" rel="noopener">📄 ${u.pdf_name || 'View PDF'}</a>` : ''}
     </div>
   `).join('');
 }
