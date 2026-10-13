@@ -35,7 +35,7 @@ function initSegments() {
 // ── SCHEDULE DATA ─────────────────────────────
 const scheduleData = {
   0: [
-    // Tuesday October 13th 2026 -- At Sea
+    // Wednesday October 14th 2026 -- At Sea
     { time: '24 hrs', title: 'Library Open -- Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
     { time: '7:00 AM', title: 'Library Quiet Time', location: 'Library, Deck 5 Mid', category: 'activity' },
     { time: '8:00 AM', title: 'Stretch Class', location: 'Fitness Center, Deck 7 Aft', category: 'wellness' },
@@ -45,20 +45,19 @@ const scheduleData = {
     { time: '9:00 AM', title: 'Table Tennis Open Play', location: 'Open Deck, Deck 8 Mid', category: 'activity' },
     { time: '9:00 AM', title: 'Bean Bag Toss Open Play', location: 'Open Deck, Deck 8 Mid', category: 'activity' },
     { time: '9:00 AM', title: 'Shuffleboard Open Play', location: 'Open Deck, Deck 5 Fwd', category: 'activity' },
-    { time: '10:00 AM', title: 'Experienced Line Dance with Kathie', location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
-    { time: '10:00 AM', title: 'Introduction to Bridge -- Learn by playing with Kevin!', location: 'Grampian, Deck 8 Aft', category: 'activity' },
-    { time: '10:00 AM', title: 'Morning Trivia with Big Mac', location: 'Morning Light, Deck 5 Fwd', category: 'entertainment' },
     { time: '10:00 AM', title: 'Library Open for Games', location: 'Library, Deck 5 Mid', category: 'activity' },
+    { time: '10:00 AM', title: 'Beginners Line Dance with Kathie', location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
+    { time: '10:00 AM', title: 'Introduction to Bridge with Kevin', location: 'Grampian, Deck 8 Aft', category: 'activity' },
+    { time: '10:00 AM', title: 'Morning Trivia with Big Mac', location: 'Morning Light, Deck 5 Fwd', category: 'entertainment' },
     { time: '10:30 AM', title: 'Stretching Class with Sally', location: 'Fitness Center, Deck 7 Aft', category: 'wellness' },
     { time: '11:00 AM', title: 'Couch Talk with Big Mac', location: 'Morning Light, Deck 5 Fwd', category: 'activity' },
     { time: '11:15 AM', title: 'Bodygroove', location: 'Neptune Lounge, Deck 5 Fwd', category: 'wellness' },
     { time: '1:30 PM', title: 'Voices of Odyssey -- Choir Singing', location: 'Observatory, Deck 8 Fwd', category: 'entertainment' },
-    { time: '2:00 PM', title: 'Beginners Line Dance with Kathie', location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
+    { time: '2:00 PM', title: 'Experienced Line Dance with Kathie', location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
     { time: '2:00 PM', title: 'Werewolf Event (Max 35 players)', location: 'Library, Deck 5 Mid', category: 'entertainment' },
     { time: '4:00 PM', title: 'Goddess Dance Class with Amira Mor', location: 'Dance Studio, Deck 3 Mid', category: 'wellness' },
     { time: '5:00 PM', title: 'Afternoon Trivia with Big Mac', location: 'Morning Light, Deck 5 Fwd', category: 'entertainment' },
-    { time: '5:30 PM', title: 'Chair Exercise with Sally', location: 'Dance Studio, Deck 3 Mid', category: 'wellness' },
-    { time: '8:30 PM', title: '🎯 Match Game -- The Game Show! with Big Mac', location: 'Neptune Lounge, Deck 5 Fwd', category: 'entertainment' },
+    { time: '8:30 PM', title: "Speaker's Corner -- Beyond the Name Tag with Julie Perkins", location: 'Coral Club, Deck 5 Aft', category: 'entertainment' },
   ],
   1: [
     { time: '24 hrs', title: 'Library Open -- Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
