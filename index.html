@@ -677,6 +677,30 @@
         <div id="groupsList" class="groups-list">
           <div style="text-align:center;padding:40px;color:var(--text-light)">Loading groups...</div>
         </div>
+
+        <!-- Group Discussion Board (shown when a group is opened) -->
+        <div id="groupDiscussion" style="display:none">
+          <div class="group-discussion-header">
+            <button class="group-back-btn" onclick="closeGroupDiscussion()">&#8592; Groups</button>
+            <div>
+              <div class="group-discussion-title" id="discussionGroupName"></div>
+              <div class="group-discussion-sub" id="discussionGroupDesc"></div>
+            </div>
+          </div>
+          <div id="groupPostsFeed" class="group-posts-feed">
+            <div style="text-align:center;padding:40px;color:var(--text-light)">Loading discussion...</div>
+          </div>
+          <div id="groupComposeArea" class="group-compose-area" style="display:none">
+            <textarea id="groupPostBody" class="group-compose-input" placeholder="Write something to the group..." rows="3"></textarea>
+            <div class="group-compose-actions">
+              <button class="btn-gold" onclick="submitGroupPost()">Post</button>
+            </div>
+          </div>
+          <div id="groupJoinPrompt" class="group-join-prompt" style="display:none">
+            <span>Join this group to participate in the discussion</span>
+            <button class="btn-gold btn-sm" id="groupJoinPromptBtn">Join Group</button>
+          </div>
+        </div>
       </div>
     </div>
     <!-- ── CHAT ── -->
