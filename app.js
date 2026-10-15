@@ -1103,33 +1103,50 @@ async function joinGroup(groupId) {
   var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
     currentUser.user_metadata.full_name || userEmail : userEmail;
   if (!userEmail) { showToast('Please log in to join groups'); return; }
+  if (!sbClient) { showToast('Not connected'); return; }
   try {
     var { error } = await sbClient.from('group_members').insert({
       group_id: groupId, user_email: userEmail, user_name: userName
     });
-    if (error && error.code !== '23505') throw error;
+    if (error) {
+      if (error.code === '23505') {
+        showToast('Already a member ✓');
+        loadGroups();
+        return;
+      }
+      console.error('joinGroup error:', error.code, error.message, error.details, error.hint);
+      showToast('Error joining group: ' + (error.message || 'unknown error'));
+      return;
+    }
     showToast('Joined group ✓');
     loadGroups();
-  } catch(e) { showToast('Error joining group'); }
+  } catch(e) {
+    console.error('joinGroup exception:', e);
+    showToast('Error joining group');
+  }
 }
 
 async function leaveGroup(groupId) {
   var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  if (!sbClient) { showToast('Not connected'); return; }
   try {
-    await sbClient.from('group_members').delete()
+    var { error } = await sbClient.from('group_members').delete()
       .eq('group_id', groupId).eq('user_email', userEmail);
+    if (error) { console.error('leaveGroup error:', error); showToast('Error leaving group'); return; }
     showToast('Left group');
     loadGroups();
-  } catch(e) { showToast('Error leaving group'); }
+  } catch(e) { console.error('leaveGroup exception:', e); showToast('Error leaving group'); }
 }
 
 async function deleteGroup(groupId) {
   if (!confirm('Delete this group? This cannot be undone.')) return;
+  if (!sbClient) { showToast('Not connected'); return; }
   try {
-    await sbClient.from('groups').delete().eq('id', groupId);
+    var { error } = await sbClient.from('groups').delete().eq('id', groupId);
+    if (error) { console.error('deleteGroup error:', error); showToast('Error deleting group'); return; }
     showToast('Group deleted');
     loadGroups();
-  } catch(e) { showToast('Error deleting group'); }
+  } catch(e) { console.error('deleteGroup exception:', e); showToast('Error deleting group'); }
 }
 
 window.loadGroups = loadGroups;
@@ -2419,33 +2436,50 @@ async function joinGroup(groupId) {
   var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
     currentUser.user_metadata.full_name || userEmail : userEmail;
   if (!userEmail) { showToast('Please log in to join groups'); return; }
+  if (!sbClient) { showToast('Not connected'); return; }
   try {
     var { error } = await sbClient.from('group_members').insert({
       group_id: groupId, user_email: userEmail, user_name: userName
     });
-    if (error && error.code !== '23505') throw error;
+    if (error) {
+      if (error.code === '23505') {
+        showToast('Already a member ✓');
+        loadGroups();
+        return;
+      }
+      console.error('joinGroup error:', error.code, error.message, error.details, error.hint);
+      showToast('Error joining group: ' + (error.message || 'unknown error'));
+      return;
+    }
     showToast('Joined group ✓');
     loadGroups();
-  } catch(e) { showToast('Error joining group'); }
+  } catch(e) {
+    console.error('joinGroup exception:', e);
+    showToast('Error joining group');
+  }
 }
 
 async function leaveGroup(groupId) {
   var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  if (!sbClient) { showToast('Not connected'); return; }
   try {
-    await sbClient.from('group_members').delete()
+    var { error } = await sbClient.from('group_members').delete()
       .eq('group_id', groupId).eq('user_email', userEmail);
+    if (error) { console.error('leaveGroup error:', error); showToast('Error leaving group'); return; }
     showToast('Left group');
     loadGroups();
-  } catch(e) { showToast('Error leaving group'); }
+  } catch(e) { console.error('leaveGroup exception:', e); showToast('Error leaving group'); }
 }
 
 async function deleteGroup(groupId) {
   if (!confirm('Delete this group? This cannot be undone.')) return;
+  if (!sbClient) { showToast('Not connected'); return; }
   try {
-    await sbClient.from('groups').delete().eq('id', groupId);
+    var { error } = await sbClient.from('groups').delete().eq('id', groupId);
+    if (error) { console.error('deleteGroup error:', error); showToast('Error deleting group'); return; }
     showToast('Group deleted');
     loadGroups();
-  } catch(e) { showToast('Error deleting group'); }
+  } catch(e) { console.error('deleteGroup exception:', e); showToast('Error deleting group'); }
 }
 
 window.loadGroups = loadGroups;
