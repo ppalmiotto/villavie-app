@@ -51,7 +51,7 @@ sbClient.auth.onAuthStateChange((event, session) => {
 // ── LOGIN ─────────────────────────────────────
 async function residentLogin() {
 const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-const password = document.getElementById('loginPassword').value;
+const password = document.getElementById('loginPassword').value.trim();
 const errorEl = document.getElementById('loginError');
 const btnEl = document.getElementById('loginBtn');
 
@@ -171,7 +171,9 @@ if (level === 'team') {
 if (typeof initSegments === 'function') initSegments();
 if (typeof renderSegmentFilter === 'function') renderSegmentFilter();
 if (typeof renderPorts === 'function') renderPorts();
+if (typeof initDayNav === 'function') initDayNav();
 if (typeof renderSchedule === 'function') renderSchedule(0);
+if (typeof loadTodayMenu === 'function') loadTodayMenu();
 if (typeof renderUpdates === 'function') renderUpdates();
 if (typeof renderSafety === 'function') renderSafety();
 if (typeof renderSpaMenu === 'function') renderSpaMenu();

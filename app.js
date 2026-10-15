@@ -33,7 +33,24 @@ function initSegments() {
 // segments and activeSegment are set by ports.js after lazy load
 
 // ── SCHEDULE DATA ─────────────────────────────
-const scheduleData = {
+// scheduleData is now loaded from Supabase daily_schedule table
+const scheduleData = {}; // keyed by ISO date string e.g. '2026-10-16'
+
+async function loadScheduleForDate(isoDate) {
+  if (!window.sbClient) return [];
+  if (scheduleData[isoDate]) return scheduleData[isoDate];
+  const { data, error } = await window.sbClient
+    .from('daily_schedule')
+    .select('time, title, location, category')
+    .eq('event_date', isoDate)
+    .order('created_at', { ascending: true });
+  if (error) { console.error('Schedule load error:', error); return []; }
+  scheduleData[isoDate] = data || [];
+  return scheduleData[isoDate];
+}
+
+// Legacy numeric index kept for backward-compat fallback
+const _legacySchedule = {
   0: [
     // Thursday October 15th 2026 -- At Sea
     { time: '24 hrs', title: 'Library Open -- Book & DVD Borrowing', location: 'Library, Deck 5 Mid', category: 'activity' },
@@ -507,8 +524,7 @@ window.escapeHtml = escapeHtml;
 
 
 // ── RENDER SCHEDULE ──────────────────────────
-function renderSchedule(dayIndex) {
-  var events = scheduleData[dayIndex] || [];
+function _renderEventList(events) {
   var el = document.getElementById('eventList');
   if (!el) return;
   if (!events.length) {
@@ -516,8 +532,25 @@ function renderSchedule(dayIndex) {
     return;
   }
   el.innerHTML = events.map(function(e) {
-    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
+    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + (e.location || '') + '</div></div></div>';
   }).join('');
+}
+
+async function renderSchedule(dayIndex) {
+  var el = document.getElementById('eventList');
+  if (!el) return;
+  // Compute the ISO date for dayIndex offset from today
+  var d = new Date();
+  d.setDate(d.getDate() + dayIndex);
+  var isoDate = d.toISOString().slice(0, 10);
+  // Show spinner while loading
+  el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">Loading schedule…</div>';
+  var events = await loadScheduleForDate(isoDate);
+  // Fallback to legacy hardcoded data if Supabase returns nothing
+  if (!events.length && _legacySchedule[dayIndex]) {
+    events = _legacySchedule[dayIndex];
+  }
+  _renderEventList(events);
 }
 window.renderSchedule = renderSchedule;
 
@@ -666,20 +699,7 @@ window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
 
 
-// ── RENDER SCHEDULE ──────────────────────────
-function renderSchedule(dayIndex) {
-  var events = scheduleData[dayIndex] || [];
-  var el = document.getElementById('eventList');
-  if (!el) return;
-  if (!events.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
-    return;
-  }
-  el.innerHTML = events.map(function(e) {
-    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
-  }).join('');
-}
-window.renderSchedule = renderSchedule;
+// renderSchedule defined above (async Supabase version)
 
 
 // ══════════════════════════════════════════════
@@ -963,20 +983,7 @@ window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
 
 
-// ── RENDER SCHEDULE ──────────────────────────
-function renderSchedule(dayIndex) {
-  var events = scheduleData[dayIndex] || [];
-  var el = document.getElementById('eventList');
-  if (!el) return;
-  if (!events.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
-    return;
-  }
-  el.innerHTML = events.map(function(e) {
-    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
-  }).join('');
-}
-window.renderSchedule = renderSchedule;
+// renderSchedule defined above (async Supabase version)
 
 // ══════════════════════════════════════════════
 //  COMMUNITY GROUPS
@@ -1476,20 +1483,7 @@ window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
 
 
-// ── RENDER SCHEDULE ──────────────────────────
-function renderSchedule(dayIndex) {
-  var events = scheduleData[dayIndex] || [];
-  var el = document.getElementById('eventList');
-  if (!el) return;
-  if (!events.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
-    return;
-  }
-  el.innerHTML = events.map(function(e) {
-    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
-  }).join('');
-}
-window.renderSchedule = renderSchedule;
+// renderSchedule defined above (async Supabase version)
 
 
 // ══════════════════════════════════════════════
@@ -1773,20 +1767,7 @@ window.closePoll = closePoll;
 window.escapeHtml = escapeHtml;
 
 
-// ── RENDER SCHEDULE ──────────────────────────
-function renderSchedule(dayIndex) {
-  var events = scheduleData[dayIndex] || [];
-  var el = document.getElementById('eventList');
-  if (!el) return;
-  if (!events.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No events scheduled for this day.<br>Check back for updates from the crew.</div>';
-    return;
-  }
-  el.innerHTML = events.map(function(e) {
-    return '<div class="event-item"><div class="event-time">' + e.time + '</div><div class="event-dot ev-dot-' + e.category + '"></div><div class="event-body"><div class="event-title">' + e.title + '</div><div class="event-location">' + e.location + '</div></div></div>';
-  }).join('');
-}
-window.renderSchedule = renderSchedule;
+// renderSchedule defined above (async Supabase version)
 
 
 // SUB-TAB SWITCHER
@@ -2172,30 +2153,58 @@ setInterval(function() {
 }, 4 * 60 * 1000);
 
 // ── DINING MENU ──────────────────────────────
-var menuData = {
-  breakfast: ['Continental Buffet', 'Eggs Benedict with Smoked Salmon', 'Fresh Tropical Fruit Station', 'Freshly Baked Pastries & Breads', 'Juices, Teas & Specialty Coffees'],
-  lunch: ['Poolside Barbecue', 'Classic Caesar Salad', 'Chilled Gazpacho', 'Grilled Fish of the Day', 'Artisan Dessert Selection'],
-  dinner: ['Amuse-Bouche from the Chef', 'Seared Scallops with Cauliflower Puree', 'Lobster Bisque', 'Prime Beef Tenderloin . Pan-seared Sea Bass', 'Souffle du Jour . Cheese Selection']
-};
+var menuData = { breakfast: [], lunch: [], dinner: [] };
+
+function _renderMenuSection(items, elId) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (!items || !items.length) { el.innerHTML = '<div class="menu-item" style="color:var(--text-light)">Menu not yet available</div>'; return; }
+  el.innerHTML = items.map(function(item) {
+    return '<div class="menu-item">' + item.trim().replace(/^[.•|-]\s*/, '') + '</div>';
+  }).join('');
+}
+
+async function loadTodayMenu() {
+  if (!window.sbClient) return;
+  var today = new Date().toISOString().slice(0, 10);
+  var { data, error } = await window.sbClient
+    .from('daily_menu')
+    .select('breakfast, lunch, dinner')
+    .eq('menu_date', today)
+    .maybeSingle();
+  if (error) { console.error('Menu load error:', error); return; }
+  if (data) {
+    menuData.breakfast = data.breakfast ? data.breakfast.split('|') : [];
+    menuData.lunch     = data.lunch     ? data.lunch.split('|')     : [];
+    menuData.dinner    = data.dinner    ? data.dinner.split('|')    : [];
+    _renderMenuSection(menuData.breakfast, 'menuBreakfastDisplay');
+    _renderMenuSection(menuData.lunch,     'menuLunchDisplay');
+    _renderMenuSection(menuData.dinner,    'menuDinnerDisplay');
+  }
+}
+window.loadTodayMenu = loadTodayMenu;
 
 function saveMenu() {
   var breakfast = document.getElementById('menuBreakfast').value.trim();
   var lunch = document.getElementById('menuLunch').value.trim();
   var dinner = document.getElementById('menuDinner').value.trim();
 
-  function updateSection(text, elId) {
-    if (!text) return;
-    var el = document.getElementById(elId);
-    if (!el) return;
-    var items = text.split('\n').filter(function(l) { return l.trim(); });
-    el.innerHTML = items.map(function(item) {
-      return '<div class="menu-item">' + item.trim().replace(/^[.•-]\s*/, '') + '</div>';
-    }).join('');
-  }
+  if (breakfast) _renderMenuSection(breakfast.split('\n').filter(l => l.trim()), 'menuBreakfastDisplay');
+  if (lunch)     _renderMenuSection(lunch.split('\n').filter(l => l.trim()),     'menuLunchDisplay');
+  if (dinner)    _renderMenuSection(dinner.split('\n').filter(l => l.trim()),    'menuDinnerDisplay');
 
-  updateSection(breakfast, 'menuBreakfastDisplay');
-  updateSection(lunch, 'menuLunchDisplay');
-  updateSection(dinner, 'menuDinnerDisplay');
+  // Also upsert into Supabase for persistence
+  if (window.sbClient) {
+    var today = new Date().toISOString().slice(0, 10);
+    window.sbClient.from('daily_menu').upsert({
+      menu_date: today,
+      breakfast: breakfast || undefined,
+      lunch:     lunch     || undefined,
+      dinner:    dinner    || undefined
+    }, { onConflict: 'menu_date', ignoreDuplicates: false }).then(({ error }) => {
+      if (error) console.error('Menu save error:', error);
+    });
+  }
 
   hideForm('editMenuForm');
   document.getElementById('menuBreakfast').value = '';
