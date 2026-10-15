@@ -1059,10 +1059,10 @@ function renderGroups(userRank, userEmail) {
       '</div>' +
       '<div class="group-card-actions">' +
         (isMember ?
-          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\"' + g.id + '\")">&#10003; Joined</button>' :
-          '<button class="btn-gold btn-sm" onclick="joinGroup(\"' + g.id + '\")">Join</button>') +
+          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\'' + g.id + '\')">&#10003; Joined</button>' :
+          '<button class="btn-gold btn-sm" onclick="joinGroup(\'' + g.id + '\')">Join</button>') +
         ((isOwner || isAdmin) ?
-          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\"' + g.id + '\")">&#128465;</button>' : '') +
+          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\'' + g.id + '\')">&#128465;</button>' : '') +
       '</div>' +
     '</div>';
   }).join('');
@@ -2392,10 +2392,10 @@ function renderGroups(userRank, userEmail) {
       '</div>' +
       '<div class="group-card-actions">' +
         (isMember ?
-          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\"' + g.id + '\")">&#10003; Joined</button>' :
-          '<button class="btn-gold btn-sm" onclick="joinGroup(\"' + g.id + '\")">Join</button>') +
+          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\'' + g.id + '\')">&#10003; Joined</button>' :
+          '<button class="btn-gold btn-sm" onclick="joinGroup(\'' + g.id + '\')">Join</button>') +
         ((isOwner || isAdmin) ?
-          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\"' + g.id + '\")">&#128465;</button>' : '') +
+          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\'' + g.id + '\')">&#128465;</button>' : '') +
       '</div>' +
     '</div>';
   }).join('');
