@@ -985,6 +985,8 @@ window.renderSchedule = renderSchedule;
 var accessLevelOrder = { 'renter': 0, 'resident': 1, 'founder': 2, 'team': 3 };
 var groupsData = [];
 var groupMemberships = [];
+var activeGroupId = null;
+var activeGroupData = null;
 
 async function loadGroups() {
   if (!sbClient) return;
@@ -1000,7 +1002,6 @@ async function loadGroups() {
     if (error) throw error;
     groupsData = groups || [];
 
-    // Get current user memberships
     var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
     var { data: memberships } = await sbClient
       .from('group_members')
@@ -1021,7 +1022,6 @@ function renderGroups(userRank, userEmail) {
   var subtitle = document.getElementById('groupsSubtitle');
   if (!el) return;
 
-  // Filter groups by access level
   var visible = groupsData.filter(function(g) {
     var groupRank = accessLevelOrder[g.min_access_level] || 0;
     return userRank >= groupRank;
@@ -1038,13 +1038,13 @@ function renderGroups(userRank, userEmail) {
 
   el.innerHTML = visible.map(function(g) {
     var memberCount = (g.group_members || []).length;
-    var isMember = groupMemberships.indexOf(g.group_id || g.id) > -1 || 
+    var isMember = groupMemberships.indexOf(g.id) > -1 ||
                    (g.group_members || []).some(function(m) { return m.user_email === userEmail; });
     var isOwner = g.created_by === userEmail;
     var isAdmin = typeof window.isAdmin !== 'undefined' && window.isAdmin;
     var levelLabel = levelLabels[g.min_access_level] || g.min_access_level;
 
-    return '<div class="group-card">' +
+    return '<div class="group-card" onclick="openGroupDiscussion(\'' + g.id + '\')" style="cursor:pointer">' +
       '<div class="group-card-body">' +
         '<div class="group-card-header">' +
           '<div class="group-name">' + escapeHtml(g.name) + '</div>' +
@@ -1059,13 +1059,170 @@ function renderGroups(userRank, userEmail) {
       '</div>' +
       '<div class="group-card-actions">' +
         (isMember ?
-          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\'' + g.id + '\')">&#10003; Joined</button>' :
-          '<button class="btn-gold btn-sm" onclick="joinGroup(\'' + g.id + '\')">Join</button>') +
+          '<button class="btn-outline btn-sm group-joined-btn" onclick="event.stopPropagation();leaveGroup(\'' + g.id + '\')">&#10003; Joined</button>' :
+          '<button class="btn-gold btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>') +
         ((isOwner || isAdmin) ?
-          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\'' + g.id + '\')">&#128465;</button>' : '') +
+          '<button class="btn-sm group-delete-btn" onclick="event.stopPropagation();deleteGroup(\'' + g.id + '\')">&#128465;</button>' : '') +
       '</div>' +
     '</div>';
   }).join('');
+}
+
+// ── GROUP DISCUSSION BOARD ────────────────────
+
+async function openGroupDiscussion(groupId) {
+  var g = groupsData.find(function(x) { return x.id === groupId; });
+  if (!g) return;
+  activeGroupId = groupId;
+  activeGroupData = g;
+
+  // Show panel immediately with loading state
+  document.getElementById('groupsList').style.display = 'none';
+  document.getElementById('createGroupForm').style.display = 'none';
+  var secHdr = document.querySelector('#view-groups .section-header');
+  if (secHdr) secHdr.style.display = 'none';
+  document.getElementById('groupDiscussion').style.display = 'block';
+  document.getElementById('discussionGroupName').textContent = g.name;
+  document.getElementById('discussionGroupDesc').textContent = g.description || '';
+  document.getElementById('groupComposeArea').style.display = 'none';
+  document.getElementById('groupJoinPrompt').style.display = 'none';
+
+  // Re-check membership live from DB (avoids stale cache)
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var isMember = false;
+  if (sbClient && userEmail) {
+    try {
+      var { data: mem } = await sbClient
+        .from('group_members')
+        .select('group_id')
+        .eq('group_id', groupId)
+        .eq('user_email', userEmail)
+        .maybeSingle();
+      isMember = !!mem;
+    } catch(e) {
+      // fallback to cached value
+      isMember = groupMemberships.indexOf(groupId) > -1 ||
+                 (g.group_members || []).some(function(m) { return m.user_email === userEmail; });
+    }
+  }
+
+  document.getElementById('groupComposeArea').style.display = isMember ? 'block' : 'none';
+  document.getElementById('groupJoinPrompt').style.display = isMember ? 'none' : 'block';
+  if (!isMember) {
+    document.getElementById('groupJoinPromptBtn').onclick = function() { joinGroupAndRefresh(groupId); };
+  }
+
+  loadGroupPosts(groupId);
+}
+
+function closeGroupDiscussion() {
+  activeGroupId = null;
+  activeGroupData = null;
+  document.getElementById('groupDiscussion').style.display = 'none';
+  document.getElementById('groupsList').style.display = 'block';
+  var secHdr = document.querySelector('#view-groups .section-header');
+  if (secHdr) secHdr.style.display = 'flex';
+  loadGroups();
+}
+
+async function loadGroupPosts(groupId) {
+  var feed = document.getElementById('groupPostsFeed');
+  if (!feed || !sbClient) return;
+  feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-light)">Loading...</div>';
+
+  try {
+    var { data: posts, error } = await sbClient
+      .from('group_posts')
+      .select('*')
+      .eq('group_id', groupId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    renderGroupPosts(posts || []);
+  } catch(e) {
+    console.error('loadGroupPosts error:', e);
+    feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-light)">Could not load posts.</div>';
+  }
+}
+
+function renderGroupPosts(posts) {
+  var feed = document.getElementById('groupPostsFeed');
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var isAdmin = typeof window.isAdmin !== 'undefined' && window.isAdmin;
+
+  if (!posts.length) {
+    feed.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px">No posts yet.<br>Be the first to start the conversation!</div>';
+    return;
+  }
+
+  feed.innerHTML = posts.map(function(p) {
+    var canDelete = p.user_email === userEmail || isAdmin;
+    var displayName = p.user_name || p.user_email;
+    var dt = new Date(p.created_at);
+    var timeStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' +
+                  dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return '<div class="group-post">' +
+      '<div class="group-post-header">' +
+        '<span class="group-post-author">' + escapeHtml(displayName) + '</span>' +
+        '<span>' +
+          '<span class="group-post-time">' + timeStr + '</span>' +
+          (canDelete ? '<button class="group-post-delete" onclick="deleteGroupPost(\'' + p.id + '\')">&#128465;</button>' : '') +
+        '</span>' +
+      '</div>' +
+      '<div class="group-post-body">' + escapeHtml(p.body) + '</div>' +
+    '</div>';
+  }).join('');
+
+  feed.scrollTop = feed.scrollHeight;
+}
+
+async function submitGroupPost() {
+  var body = document.getElementById('groupPostBody').value.trim();
+  if (!body) { showToast('Write something first'); return; }
+  if (!activeGroupId || !sbClient) return;
+
+  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
+  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
+    currentUser.user_metadata.full_name || userEmail : userEmail;
+
+  var btn = document.querySelector('#groupComposeArea .btn-gold');
+  if (btn) { btn.textContent = 'Posting…'; btn.disabled = true; }
+
+  try {
+    var { error } = await sbClient.from('group_posts').insert({
+      group_id: activeGroupId,
+      user_email: userEmail,
+      user_name: userName,
+      body: body
+    });
+    if (error) throw error;
+    document.getElementById('groupPostBody').value = '';
+    loadGroupPosts(activeGroupId);
+  } catch(e) {
+    console.error('submitGroupPost error:', e);
+    showToast('Error posting: ' + (e.message || 'unknown error'));
+  } finally {
+    if (btn) { btn.textContent = 'Post'; btn.disabled = false; }
+  }
+}
+
+async function deleteGroupPost(postId) {
+  if (!confirm('Delete this post?')) return;
+  if (!sbClient) return;
+  try {
+    var { error } = await sbClient.from('group_posts').delete().eq('id', postId);
+    if (error) throw error;
+    loadGroupPosts(activeGroupId);
+  } catch(e) {
+    console.error('deleteGroupPost error:', e);
+    showToast('Error deleting post');
+  }
+}
+
+async function joinGroupAndRefresh(groupId) {
+  await joinGroup(groupId);
+  await loadGroups();
+  openGroupDiscussion(groupId);
 }
 
 async function createGroup() {
@@ -1090,7 +1247,7 @@ async function createGroup() {
     hideForm('createGroupForm');
     document.getElementById('groupName').value = '';
     document.getElementById('groupDesc').value = '';
-    showToast('Group created ✓');
+    showToast('Group created \u2713');
     loadGroups();
   } catch(e) {
     console.error('createGroup error:', e);
@@ -1110,7 +1267,7 @@ async function joinGroup(groupId) {
     });
     if (error) {
       if (error.code === '23505') {
-        showToast('Already a member ✓');
+        showToast('Already a member \u2713');
         loadGroups();
         return;
       }
@@ -1118,7 +1275,7 @@ async function joinGroup(groupId) {
       showToast('Error joining group: ' + (error.message || 'unknown error'));
       return;
     }
-    showToast('Joined group ✓');
+    showToast('Joined group \u2713');
     loadGroups();
   } catch(e) {
     console.error('joinGroup exception:', e);
@@ -1154,6 +1311,12 @@ window.createGroup = createGroup;
 window.joinGroup = joinGroup;
 window.leaveGroup = leaveGroup;
 window.deleteGroup = deleteGroup;
+window.openGroupDiscussion = openGroupDiscussion;
+window.closeGroupDiscussion = closeGroupDiscussion;
+window.submitGroupPost = submitGroupPost;
+window.deleteGroupPost = deleteGroupPost;
+window.joinGroupAndRefresh = joinGroupAndRefresh;
+
 
 // ── DYNAMIC DAY NAV ──────────────────────────
 
@@ -2311,179 +2474,3 @@ window.approveVenue = approveVenue;
 window.declineVenue = declineVenue;
 window.renderVenueCalendar = renderVenueCalendar;
 
-// ══════════════════════════════════════════════
-//  COMMUNITY GROUPS
-// ══════════════════════════════════════════════
-
-var accessLevelOrder = { 'renter': 0, 'resident': 1, 'founder': 2, 'team': 3 };
-var groupsData = [];
-var groupMemberships = [];
-
-async function loadGroups() {
-  if (!sbClient) return;
-  var userLevel = window.accessLevel || 'resident';
-  var userRank = accessLevelOrder[userLevel] || 0;
-
-  try {
-    var { data: groups, error } = await sbClient
-      .from('groups')
-      .select('*, group_members(user_email)')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    groupsData = groups || [];
-
-    // Get current user memberships
-    var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
-    var { data: memberships } = await sbClient
-      .from('group_members')
-      .select('group_id')
-      .eq('user_email', userEmail);
-    groupMemberships = (memberships || []).map(function(m) { return m.group_id; });
-
-    renderGroups(userRank, userEmail);
-  } catch(e) {
-    console.error('loadGroups error:', e);
-    var el = document.getElementById('groupsList');
-    if (el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">Could not load groups.</div>';
-  }
-}
-
-function renderGroups(userRank, userEmail) {
-  var el = document.getElementById('groupsList');
-  var subtitle = document.getElementById('groupsSubtitle');
-  if (!el) return;
-
-  // Filter groups by access level
-  var visible = groupsData.filter(function(g) {
-    var groupRank = accessLevelOrder[g.min_access_level] || 0;
-    return userRank >= groupRank;
-  });
-
-  if (subtitle) subtitle.textContent = visible.length + ' group' + (visible.length !== 1 ? 's' : '') + ' available to you';
-
-  if (!visible.length) {
-    el.innerHTML = '<div class="groups-empty"><div style="font-size:40px;margin-bottom:12px">&#128101;</div><div style="font-size:16px;font-weight:500;color:var(--navy)">No groups yet</div><div style="font-size:13px;color:var(--text-light);margin-top:6px">Be the first to create a community group</div></div>';
-    return;
-  }
-
-  var levelLabels = { renter: 'Everyone', resident: 'Residents & Founders', founder: 'Founders only', team: 'Team only' };
-
-  el.innerHTML = visible.map(function(g) {
-    var memberCount = (g.group_members || []).length;
-    var isMember = groupMemberships.indexOf(g.group_id || g.id) > -1 || 
-                   (g.group_members || []).some(function(m) { return m.user_email === userEmail; });
-    var isOwner = g.created_by === userEmail;
-    var isAdmin = typeof window.isAdmin !== 'undefined' && window.isAdmin;
-    var levelLabel = levelLabels[g.min_access_level] || g.min_access_level;
-
-    return '<div class="group-card">' +
-      '<div class="group-card-body">' +
-        '<div class="group-card-header">' +
-          '<div class="group-name">' + escapeHtml(g.name) + '</div>' +
-          (g.min_access_level !== 'renter' ?
-            '<span class="group-level-badge">' + levelLabel + '</span>' : '') +
-        '</div>' +
-        '<div class="group-desc">' + escapeHtml(g.description || '') + '</div>' +
-        '<div class="group-meta">' +
-          '<span class="group-member-count">&#128101; ' + memberCount + ' member' + (memberCount !== 1 ? 's' : '') + '</span>' +
-          '<span class="group-creator">Created by ' + escapeHtml(g.created_by_name || g.created_by || 'resident') + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="group-card-actions">' +
-        (isMember ?
-          '<button class="btn-outline btn-sm group-joined-btn" onclick="leaveGroup(\'' + g.id + '\')">&#10003; Joined</button>' :
-          '<button class="btn-gold btn-sm" onclick="joinGroup(\'' + g.id + '\')">Join</button>') +
-        ((isOwner || isAdmin) ?
-          '<button class="btn-sm group-delete-btn" onclick="deleteGroup(\'' + g.id + '\')">&#128465;</button>' : '') +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-async function createGroup() {
-  var name = document.getElementById('groupName').value.trim();
-  var desc = document.getElementById('groupDesc').value.trim();
-  var level = document.getElementById('groupLevel').value;
-  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
-  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
-    currentUser.user_metadata.full_name || userEmail : userEmail;
-
-  if (!name || !desc) { showToast('Please fill in name and description'); return; }
-  if (!sbClient) { showToast('Not connected'); return; }
-
-  try {
-    var { error } = await sbClient.from('groups').insert({
-      name: name, description: desc,
-      min_access_level: level,
-      created_by: userEmail,
-      created_by_name: userName
-    });
-    if (error) throw error;
-    hideForm('createGroupForm');
-    document.getElementById('groupName').value = '';
-    document.getElementById('groupDesc').value = '';
-    showToast('Group created ✓');
-    loadGroups();
-  } catch(e) {
-    console.error('createGroup error:', e);
-    showToast('Error creating group');
-  }
-}
-
-async function joinGroup(groupId) {
-  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
-  var userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.user_metadata) ?
-    currentUser.user_metadata.full_name || userEmail : userEmail;
-  if (!userEmail) { showToast('Please log in to join groups'); return; }
-  if (!sbClient) { showToast('Not connected'); return; }
-  try {
-    var { error } = await sbClient.from('group_members').insert({
-      group_id: groupId, user_email: userEmail, user_name: userName
-    });
-    if (error) {
-      if (error.code === '23505') {
-        showToast('Already a member ✓');
-        loadGroups();
-        return;
-      }
-      console.error('joinGroup error:', error.code, error.message, error.details, error.hint);
-      showToast('Error joining group: ' + (error.message || 'unknown error'));
-      return;
-    }
-    showToast('Joined group ✓');
-    loadGroups();
-  } catch(e) {
-    console.error('joinGroup exception:', e);
-    showToast('Error joining group');
-  }
-}
-
-async function leaveGroup(groupId) {
-  var userEmail = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.email : '';
-  if (!sbClient) { showToast('Not connected'); return; }
-  try {
-    var { error } = await sbClient.from('group_members').delete()
-      .eq('group_id', groupId).eq('user_email', userEmail);
-    if (error) { console.error('leaveGroup error:', error); showToast('Error leaving group'); return; }
-    showToast('Left group');
-    loadGroups();
-  } catch(e) { console.error('leaveGroup exception:', e); showToast('Error leaving group'); }
-}
-
-async function deleteGroup(groupId) {
-  if (!confirm('Delete this group? This cannot be undone.')) return;
-  if (!sbClient) { showToast('Not connected'); return; }
-  try {
-    var { error } = await sbClient.from('groups').delete().eq('id', groupId);
-    if (error) { console.error('deleteGroup error:', error); showToast('Error deleting group'); return; }
-    showToast('Group deleted');
-    loadGroups();
-  } catch(e) { console.error('deleteGroup exception:', e); showToast('Error deleting group'); }
-}
-
-window.loadGroups = loadGroups;
-window.createGroup = createGroup;
-window.joinGroup = joinGroup;
-window.leaveGroup = leaveGroup;
-window.deleteGroup = deleteGroup;
