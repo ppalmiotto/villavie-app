@@ -2222,15 +2222,19 @@ function renderUpdates() {
   const el = document.getElementById('updateList');
   if (!el) return;
   const catClass = { announcement: 'cat-announcement', dining: 'cat-dining', activities: 'cat-activities', general: 'cat-general' };
+  const catBorder = { announcement: 'cat-announcement-card', dining: 'cat-dining-card', activities: 'cat-activities-card', general: 'cat-general-card' };
+  const catLabel = { announcement: 'Announcement', dining: 'Dining', activities: 'Activities', general: 'General' };
   el.innerHTML = updates.map(u => `
-    <div class="update-card">
-      <div class="update-meta">
-        <span class="update-category ${catClass[u.category]}">${u.category}</span>
-        <span class="update-time">${u.time}</span>
+    <div class="update-card ${catBorder[u.category] || 'cat-general-card'}">
+      <div class="update-card-inner">
+        <div class="update-meta">
+          <span class="update-category ${catClass[u.category]}">${catLabel[u.category] || u.category}</span>
+          <span class="update-time">${u.time}</span>
+        </div>
+        <div class="update-title">${u.title}</div>
+        <div class="update-body">${u.body}</div>
+        ${u.pdf_url ? `<a class="update-pdf-link" href="${u.pdf_url}" target="_blank" rel="noopener">📄 ${u.pdf_name || 'View PDF'}</a>` : ''}
       </div>
-      <div class="update-title">${u.title}</div>
-      <div class="update-body">${u.body}</div>
-      ${u.pdf_url ? `<a class="update-pdf-link" href="${u.pdf_url}" target="_blank" rel="noopener">📄 ${u.pdf_name || 'View PDF'}</a>` : ''}
     </div>
   `).join('');
 }
