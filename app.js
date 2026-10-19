@@ -1168,12 +1168,16 @@ function renderGroupPosts(posts) {
     var dt = new Date(p.created_at);
     var timeStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' +
                   dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    var initial = (displayName || '?').charAt(0).toUpperCase();
     return '<div class="group-post">' +
       '<div class="group-post-header">' +
-        '<span class="group-post-author">' + escapeHtml(displayName) + '</span>' +
-        '<span>' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div class="group-post-avatar">' + initial + '</div>' +
+          '<span class="group-post-author">' + escapeHtml(displayName) + '</span>' +
+        '</div>' +
+        '<span style="display:flex;align-items:center;gap:4px;flex-shrink:0">' +
           '<span class="group-post-time">' + timeStr + '</span>' +
-          (canDelete ? '<button class="group-post-delete" onclick="deleteGroupPost(\'' + p.id + '\')">&#128465;</button>' : '') +
+          (canDelete ? '<button class="group-post-delete" onclick="deleteGroupPost(\'' + p.id + '\')" title="Delete post">&#128465;</button>' : '') +
         '</span>' +
       '</div>' +
       '<div class="group-post-body">' + escapeHtml(p.body) + '</div>' +
