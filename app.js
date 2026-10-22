@@ -363,11 +363,11 @@ function submitApptRequest() {
 // ── SAFETY DATA ───────────────────────────────
 const safetyData = [
   { icon: '🔥', title: 'Fire Safety', open: false,
-    content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas on Deck 11 aft</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the bridge on extension 0</li></ul>` },
+    content: `<ul><li>Do not use candles or open flames in staterooms</li><li>Smoking only permitted in designated areas: Deck 5 starboard side aft, and Deck 9 forward open deck</li><li>Fire extinguishers at every corridor junction</li><li>If you discover a fire, activate the nearest alarm and call the Bridge on extension 911</li></ul>` },
   { icon: '🏥', title: 'Medical Centre', open: false,
-    content: `<p>The Medical Centre is on Deck 3 forward, staffed 24 hours.</p><ul><li>Emergency: extension 911</li><li>Non-emergency: extension 302</li><li>Walk-in hours: 8:00-10:00 AM and 5:00-7:00 PM</li></ul>` },
+    content: `<p>The Medical Centre is on Deck 2 forward.</p><ul><li>Hours: 08:00–11:00 and 16:00–19:00</li><li>Outside hours: contact Guest Services at extension 65</li><li>Emergency: call the Bridge at extension 911</li></ul>` },
   { icon: '🌊', title: 'Man Overboard Procedure', open: false,
-    content: `<ul><li>Shout "Man Overboard" loudly and call the bridge on extension 0</li><li>Throw the nearest lifebuoy ring toward the person</li><li>Keep the person in sight -- do NOT jump in after them</li></ul>` },
+    content: `<ul><li>Shout "Man Overboard" loudly and contact the Bridge immediately at extension 911</li><li>Throw the nearest lifebuoy ring toward the person</li><li>Keep the person in sight -- do NOT jump in after them</li></ul>` },
   { icon: '☀️', title: 'Sun & Heat Safety', open: false,
     content: `<ul><li>Apply SPF 30+ sunscreen every 2 hours when on deck or ashore</li><li>Stay hydrated -- at least 2 litres of water per day in warm ports</li><li>Seek shade between 11:00 AM and 3:00 PM</li></ul>` },
   { icon: '🔒', title: 'Personal Security', open: false,
