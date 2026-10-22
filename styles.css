@@ -1531,3 +1531,13 @@ main { flex: 1; overflow-y: auto; }
   text-decoration: none; transition: background 0.2s;
 }
 .update-pdf-btn:hover { background: var(--navy-mid); }
+
+/* ── LINKS TAB ── */
+.links-list { display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
+.links-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--white); border-radius:10px; text-decoration:none; color:inherit; border:1px solid var(--border); transition:background 0.15s; }
+.links-item:hover { background:var(--cream); }
+.links-icon { font-size:22px; flex-shrink:0; width:32px; text-align:center; }
+.links-body { flex:1; min-width:0; }
+.links-name { font-size:15px; font-weight:500; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.links-url { font-size:11px; color:var(--text-light); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.links-arrow { font-size:20px; color:var(--text-light); flex-shrink:0; }

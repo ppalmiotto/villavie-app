@@ -169,6 +169,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
       Groups
     </button>
+    <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('links',this)">
+      🔗 Links
+    </button>
     <button class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('chat',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       Chat
@@ -844,6 +847,86 @@
       </div>
 
     </div>
+    <!-- ── LINKS ── -->
+    <div class="view" id="view-links" role="tabpanel">
+      <div class="venues-hero">
+        <div class="venues-icon">🔗</div>
+        <div class="venues-title">Quick Links</div>
+        <div class="venues-sub">Forms, resources &amp; social channels</div>
+      </div>
+      <div class="view-inner">
+
+        <div class="section-header" style="margin-top:0">
+          <div><div class="section-title">Resident Services</div></div>
+        </div>
+        <div class="links-list">
+          <a class="links-item" href="https://booking.villavieresidences.com/resident-travel-profile" target="_blank" rel="noopener">
+            <span class="links-icon">✈️</span>
+            <div class="links-body"><div class="links-name">Resident Travel Profile</div><div class="links-url">booking.villavieresidences.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://booking.villavieresidences.com/embarkation-information-update-form" target="_blank" rel="noopener">
+            <span class="links-icon">📋</span>
+            <div class="links-body"><div class="links-name">Embarkation Information Update Form</div><div class="links-url">booking.villavieresidences.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://booking.villavieresidences.com/friends-and-family-reservation-form" target="_blank" rel="noopener">
+            <span class="links-icon">🚢</span>
+            <div class="links-body"><div class="links-name">Boarding Request Form</div><div class="links-url">booking.villavieresidences.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://villavieresidences.com/payment/" target="_blank" rel="noopener">
+            <span class="links-icon">💳</span>
+            <div class="links-body"><div class="links-name">Credit Card Payment</div><div class="links-url">villavieresidences.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://villavieresidences.circle.so/c/general-resident-services-announcements/resident-travel-forms-mandatory-submission-requirements" target="_blank" rel="noopener">
+            <span class="links-icon">📄</span>
+            <div class="links-body"><div class="links-name">Resident Travel Forms</div><div class="links-url">villavieresidences.circle.so</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+        </div>
+
+        <div class="section-header">
+          <div><div class="section-title">Knowledge &amp; Resources</div></div>
+        </div>
+        <div class="links-list">
+          <a class="links-item" href="https://doc.clickup.com/9015080643/d/h/8cnedp3-4975/a0733085b9806a2" target="_blank" rel="noopener">
+            <span class="links-icon">📚</span>
+            <div class="links-body"><div class="links-name">Resident Knowledgebase</div><div class="links-url">doc.clickup.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://info.villavieresidences.com/" target="_blank" rel="noopener">
+            <span class="links-icon">🌐</span>
+            <div class="links-body"><div class="links-name">Public Knowledgebase</div><div class="links-url">info.villavieresidences.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+        </div>
+
+        <div class="section-header">
+          <div><div class="section-title">Social &amp; Community</div></div>
+        </div>
+        <div class="links-list">
+          <a class="links-item" href="https://www.youtube.com/@VillaVie.R" target="_blank" rel="noopener">
+            <span class="links-icon">▶️</span>
+            <div class="links-body"><div class="links-name">VVRI YouTube Channel</div><div class="links-url">youtube.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://www.facebook.com/VillaVieResidences" target="_blank" rel="noopener">
+            <span class="links-icon">📘</span>
+            <div class="links-body"><div class="links-name">VVRI Facebook Page</div><div class="links-url">facebook.com</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+          <a class="links-item" href="https://www.facebook.com/groups/villavie" target="_blank" rel="noopener">
+            <span class="links-icon">👥</span>
+            <div class="links-body"><div class="links-name">VVRI Facebook Group</div><div class="links-url">facebook.com/groups/villavie</div></div>
+            <span class="links-arrow">›</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 
   <!-- BOTTOM NAV — 4 tabs only -->
@@ -879,6 +962,10 @@
     <button class="bnav-btn" onclick="switchTab('chat',this);syncTopNav('chat')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       <span>Chat</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('links',this);syncTopNav('links')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      <span>Links</span>
     </button>
   </div>
 </div>

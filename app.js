@@ -721,7 +721,7 @@ function switchTab(id, tab) {
 }
 
 function syncTopNav(id) {
-  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'groups', 'chat'];
+  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'venues', 'groups', 'links', 'chat'];
   document.querySelectorAll('.nav-tab').forEach((t, i) => t.classList.toggle('active', tabMap[i] === id));
 }
 
@@ -1509,7 +1509,7 @@ function switchTab(id, tab) {
 }
 
 function syncTopNav(id) {
-  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'groups', 'chat'];
+  const tabMap = ['itinerary', 'schedule', 'updates', 'safety', 'spa', 'venues', 'groups', 'links', 'chat'];
   document.querySelectorAll('.nav-tab').forEach((t, i) => t.classList.toggle('active', tabMap[i] === id));
 }
 
