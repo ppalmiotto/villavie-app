@@ -1541,3 +1541,13 @@ main { flex: 1; overflow-y: auto; }
 .links-name { font-size:15px; font-weight:500; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .links-url { font-size:11px; color:var(--text-light); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .links-arrow { font-size:20px; color:var(--text-light); flex-shrink:0; }
+
+/* ── ALWAYS AVAILABLE ── */
+.always-available { margin-top:24px; padding-top:16px; border-top:1px solid var(--border); }
+.always-title { font-size:13px; font-weight:600; color:var(--text-light); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px; }
+.always-list { display:flex; flex-direction:column; gap:2px; }
+.always-item { display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--cream); border-radius:8px; }
+.always-time { font-size:11px; font-weight:600; color:var(--text-light); min-width:62px; text-align:right; flex-shrink:0; }
+.always-body { flex:1; min-width:0; }
+.always-name { font-size:13px; font-weight:500; color:var(--navy); }
+.always-loc { font-size:11px; color:var(--text-light); margin-top:1px; }
